@@ -24,6 +24,25 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  events: {
+    async signIn({ user, isNewUser }) {
+      if (user.id) {
+        try {
+          await prisma.activity.create({
+            data: {
+              userId: user.id,
+              type: isNewUser ? "signup" : "login",
+              message: isNewUser
+                ? "Account created and verified"
+                : "Successfully signed in with Google",
+            },
+          });
+        } catch (error) {
+          console.error("Failed to log sign in activity:", error);
+        }
+      }
+    },
+  },
   pages: {
     signIn: "/",
   },

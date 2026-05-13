@@ -4,9 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
-  ArrowLeft,
   User,
   Bell,
   Shield,
@@ -15,6 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { Header } from "@/components/Header";
 
 export default function Settings() {
   const { data: session, status } = useSession();
@@ -32,24 +31,7 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/dashboard"
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-              </Link>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Settings
-              </h1>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -194,16 +176,6 @@ export default function Settings() {
             </button>
           </div>
         </Card>
-
-        {/* Back to Dashboard */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/dashboard"
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
       </main>
     </div>
   );
