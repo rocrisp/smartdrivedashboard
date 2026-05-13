@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { TrendingUp, Activity, Users, Calendar } from "lucide-react";
+import { SkeletonStat } from "@/components/ui/Skeleton";
 
 interface Stats {
   totalSignins: number;
@@ -43,11 +44,9 @@ export function StatsOverview() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="p-4 animate-pulse">
-            <div className="h-20"></div>
-          </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <SkeletonStat key={i} />
         ))}
       </div>
     );

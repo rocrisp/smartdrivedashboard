@@ -9,14 +9,28 @@ A modern, secure proof-of-concept personal dashboard application for managing Go
 
 ## ✨ Features
 
+### Core Functionality
 - **🔐 Google OAuth Authentication**: Secure sign-in with your Google account
-- **🎨 Modern UI**: Clean, intuitive, and responsive design using Tailwind CSS
 - **💾 Database Storage**: PostgreSQL database with Prisma ORM
+- **📊 Real-time Statistics**: Track sign-ins, sessions, and account activity
+- **📝 Activity Logging**: Automatic tracking of user actions and events
+- **⚙️ Settings Management**: User preferences and account management
+
+### User Interface
+- **🎨 Modern UI**: Clean, intuitive, and responsive design using Tailwind CSS
+- **🌙 Dark Mode**: Automatic dark mode support based on system preferences
+- **📱 Mobile Responsive**: Optimized for all screen sizes and devices
+- **🔔 Toast Notifications**: Real-time feedback for user actions
+- **💀 Skeleton Loaders**: Smooth loading states for better UX
+- **♿ Accessibility**: WCAG compliant with ARIA labels and keyboard navigation
+
+### Developer Experience
 - **🔒 Type-Safe**: Built with TypeScript for reliability
-- **🌙 Dark Mode**: Automatic dark mode support
-- **📱 Responsive**: Works seamlessly on all devices
 - **⚡ Fast**: Built on Next.js 15 with React 19
 - **🛡️ Secure**: Industry-standard OAuth 2.0 authentication
+- **🎯 API Endpoints**: Health checks, statistics, and activity tracking
+- **📚 Comprehensive Docs**: Setup guides, deployment docs, and contributing guidelines
+- **🔧 Development Tools**: Automated setup, environment validation, and database seeding
 
 ## 🚀 Quick Start
 
@@ -152,6 +166,7 @@ npm run check:env
 | `npm run db:push` | Push schema to database |
 | `npm run db:generate` | Generate Prisma client |
 | `npm run db:studio` | Open Prisma Studio (database GUI) |
+| `npm run db:seed` | Seed database with sample data |
 | `npm run db:reset` | Reset database |
 
 ## 📁 Project Structure
@@ -160,28 +175,41 @@ npm run check:env
 mygoogledashboard/
 ├── app/                         # Next.js app directory
 │   ├── api/                     # API routes
-│   │   └── auth/               # NextAuth.js routes
+│   │   ├── activities/         # Activity tracking endpoints
+│   │   ├── auth/               # NextAuth.js routes
+│   │   ├── health/             # Health check endpoint
+│   │   ├── stats/              # Statistics endpoint
+│   │   └── status/             # Status endpoint
 │   ├── dashboard/              # Dashboard page
 │   │   ├── page.tsx            # Dashboard UI
 │   │   └── loading.tsx         # Loading state
+│   ├── settings/               # Settings page
 │   ├── error.tsx               # Error boundary
 │   ├── loading.tsx             # Global loading
+│   ├── not-found.tsx           # 404 page
 │   ├── layout.tsx              # Root layout
 │   ├── page.tsx                # Home/login page
 │   └── globals.css             # Global styles
 ├── components/                  # React components
 │   ├── Dashboard/              # Dashboard-specific
 │   │   ├── ActivityFeed.tsx    # Activity widget
-│   │   └── QuickActions.tsx    # Quick actions widget
+│   │   ├── QuickActions.tsx    # Quick actions widget
+│   │   └── StatsOverview.tsx   # Statistics widget
 │   ├── ui/                     # Reusable UI components
 │   │   ├── Card.tsx            # Card component
-│   │   └── Button.tsx          # Button component
-│   └── AuthProvider.tsx        # Session provider
+│   │   ├── Button.tsx          # Button component
+│   │   ├── Toast.tsx           # Toast notifications
+│   │   └── Skeleton.tsx        # Skeleton loaders
+│   ├── AuthProvider.tsx        # Session provider
+│   ├── Header.tsx              # Navigation header
+│   ├── Footer.tsx              # Footer component
+│   └── SkipToContent.tsx       # Accessibility skip link
 ├── lib/                        # Utility libraries
 │   ├── auth.ts                 # NextAuth config
 │   └── prisma.ts               # Prisma client
 ├── prisma/                     # Database
-│   └── schema.prisma           # Database schema
+│   ├── schema.prisma           # Database schema
+│   └── seed.ts                 # Database seeding
 ├── scripts/                    # Helper scripts
 │   ├── setup.sh                # Setup automation
 │   ├── check-env.js            # Environment validator
@@ -189,6 +217,8 @@ mygoogledashboard/
 ├── types/                      # TypeScript types
 │   └── next-auth.d.ts          # NextAuth types
 └── public/                     # Static files
+    ├── logo.svg                # Application logo
+    └── manifest.json           # PWA manifest
 ```
 
 ## 🔒 Security

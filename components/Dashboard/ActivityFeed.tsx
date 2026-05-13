@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Activity, CheckCircle, LogIn, UserPlus, Settings } from "lucide-react";
+import { SkeletonActivity } from "@/components/ui/Skeleton";
 
 interface ActivityItem {
   id: string;
@@ -69,9 +70,11 @@ export function ActivityFeed() {
       />
       <div className="space-y-3">
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-          </div>
+          <>
+            {[1, 2, 3].map((i) => (
+              <SkeletonActivity key={i} />
+            ))}
+          </>
         ) : activities.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <Activity className="w-12 h-12 mx-auto mb-2 opacity-50" />
