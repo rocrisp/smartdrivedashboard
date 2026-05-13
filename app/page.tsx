@@ -3,6 +3,7 @@
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Shield, Activity, Zap, Lock } from "lucide-react";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -16,7 +17,7 @@ export default function Home() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
@@ -25,40 +26,70 @@ export default function Home() {
     );
   }
 
+  const features = [
+    {
+      icon: <Shield className="w-6 h-6" />,
+      title: "Secure Authentication",
+      description: "Google OAuth 2.0 for maximum security",
+    },
+    {
+      icon: <Activity className="w-6 h-6" />,
+      title: "Real-time Activity",
+      description: "Track all your actions and events",
+    },
+    {
+      icon: <Zap className="w-6 h-6" />,
+      title: "Lightning Fast",
+      description: "Built with Next.js 15 and React 19",
+    },
+    {
+      icon: <Lock className="w-6 h-6" />,
+      title: "Privacy First",
+      description: "Your data stays secure and private",
+    },
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="max-w-md w-full mx-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
-          <div className="mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-10 h-10 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-4 py-16">
+        {/* Hero Section */}
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <div className="flex justify-center mb-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-600 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+              <div className="relative w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-2xl">
+                <svg
+                  className="w-14 h-14 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              My Google Dashboard
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Your personal dashboard for Google services
-            </p>
           </div>
 
-          <div className="space-y-4">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+            My Google Dashboard
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+            A modern, secure personal dashboard for managing your Google services.
+            Track activities, view statistics, and manage your account all in one place.
+          </p>
+
+          {/* Sign In Card */}
+          <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 mb-12">
             <button
               onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm"
+              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-6 py-4 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-all shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -78,19 +109,40 @@ export default function Home() {
               </svg>
               Sign in with Google
             </button>
-
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Securely access your Google account information
-              </p>
-            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+              Secure authentication powered by Google OAuth 2.0
+            </p>
           </div>
         </div>
 
-        <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>
-            This is a proof of concept dashboard for managing your Google
-            services in one place.
+        {/* Features Grid */}
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
+                {feature.icon}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            This is a proof of concept application demonstrating modern web
+            development with Next.js, TypeScript, and PostgreSQL.
+          </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+            Built with Next.js 15, React 19, TypeScript, Tailwind CSS, and PostgreSQL
           </p>
         </div>
       </div>
