@@ -16,6 +16,7 @@ import {
 import { Card, CardHeader } from "@/components/ui/Card";
 import { ActivityFeed } from "@/components/Dashboard/ActivityFeed";
 import { QuickActions } from "@/components/Dashboard/QuickActions";
+import { StatsOverview } from "@/components/Dashboard/StatsOverview";
 import { Header } from "@/components/Header";
 
 export default function Dashboard() {
@@ -70,6 +71,11 @@ export default function Dashboard() {
             </div>
           </div>
         </Card>
+
+        {/* Stats Overview */}
+        <div className="mb-6">
+          <StatsOverview />
+        </div>
 
         {/* Info Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
