@@ -92,7 +92,7 @@ export default function Dashboard() {
                 Welcome back, {session.user?.name?.split(" ")[0]}!
               </h2>
               <p className="text-gray-600 dark:text-gray-300">
-                Here's your personal dashboard overview
+                Here&apos;s your personal dashboard overview
               </p>
             </div>
             <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900 rounded-lg">
