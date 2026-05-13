@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function Settings() {
   const { data: session, status } = useSession();
@@ -30,7 +31,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <Header />
 
       {/* Main Content */}
@@ -177,6 +178,7 @@ export default function Settings() {
           </div>
         </Card>
       </main>
+      <Footer />
     </div>
   );
 }

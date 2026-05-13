@@ -18,6 +18,7 @@ import { ActivityFeed } from "@/components/Dashboard/ActivityFeed";
 import { QuickActions } from "@/components/Dashboard/QuickActions";
 import { StatsOverview } from "@/components/Dashboard/StatsOverview";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -38,7 +39,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <Header />
 
       {/* Main Content */}
@@ -205,16 +206,8 @@ export default function Dashboard() {
           <QuickActions />
         </div>
 
-        {/* Footer Info */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            This is a proof of concept dashboard showcasing Google OAuth integration with Next.js
-          </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-            Built with Next.js 15, TypeScript, Tailwind CSS, and PostgreSQL
-          </p>
-        </div>
       </main>
+      <Footer />
     </div>
   );
 }
