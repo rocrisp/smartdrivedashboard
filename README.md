@@ -1,186 +1,304 @@
-# My Google Dashboard
+# My Google Dashboard 🚀
 
-A proof-of-concept personal dashboard application for managing Google services, built with Next.js, TypeScript, and PostgreSQL.
+A modern, secure proof-of-concept personal dashboard application for managing Google services, built with the latest web technologies.
 
-## Features
+![Next.js](https://img.shields.io/badge/Next.js-15-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)
+![React](https://img.shields.io/badge/React-19-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 
-- **Google OAuth Authentication**: Secure sign-in with your Google account
-- **Modern UI**: Clean, intuitive, and responsive design using Tailwind CSS
-- **Database Storage**: PostgreSQL database for user data with Prisma ORM
-- **Type-Safe**: Built with TypeScript for reliability
-- **Dark Mode**: Automatic dark mode support
+## ✨ Features
 
-## Tech Stack
+- **🔐 Google OAuth Authentication**: Secure sign-in with your Google account
+- **🎨 Modern UI**: Clean, intuitive, and responsive design using Tailwind CSS
+- **💾 Database Storage**: PostgreSQL database with Prisma ORM
+- **🔒 Type-Safe**: Built with TypeScript for reliability
+- **🌙 Dark Mode**: Automatic dark mode support
+- **📱 Responsive**: Works seamlessly on all devices
+- **⚡ Fast**: Built on Next.js 15 with React 19
+- **🛡️ Secure**: Industry-standard OAuth 2.0 authentication
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Authentication**: NextAuth.js with Google Provider
-- **Database**: PostgreSQL
-- **ORM**: Prisma
-- **Icons**: Lucide React
+## 🚀 Quick Start
 
-## Prerequisites
+### Prerequisites
 
-- Node.js 18+ installed
-- PostgreSQL database (local or remote)
-- Google Cloud Console account
+- **Node.js** 18 or later ([Download](https://nodejs.org/))
+- **PostgreSQL** database (local or cloud)
+- **Google Cloud** account for OAuth credentials
 
-## Setup Instructions
-
-### 1. Clone and Install
+### Option 1: Automated Setup (Recommended)
 
 ```bash
-# Navigate to the project directory
-cd mygoogledashboard
+# Run the setup script
+npm run setup
 
-# Install dependencies
-npm install
+# Configure your .env file (see instructions below)
+# Then push database schema
+npm run db:push
+
+# Start the development server
+npm run dev
 ```
 
-### 2. Set Up PostgreSQL Database
+### Option 2: Manual Setup
 
-You can use a local PostgreSQL installation or a cloud provider like:
-- [Supabase](https://supabase.com) (free tier available)
-- [Railway](https://railway.app) (free tier available)
-- [Neon](https://neon.tech) (free tier available)
-
-For local PostgreSQL:
 ```bash
-# Install PostgreSQL (macOS)
+# 1. Install dependencies
+npm install
+
+# 2. Copy environment template
+cp .env.example .env
+
+# 3. Edit .env with your credentials (see Configuration section)
+
+# 4. Generate Prisma client
+npm run db:generate
+
+# 5. Push database schema
+npm run db:push
+
+# 6. Start development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## ⚙️ Configuration
+
+### 1. PostgreSQL Database
+
+Choose one of these options:
+
+#### Option A: Cloud Database (Easiest)
+- **[Supabase](https://supabase.com)** - Free tier, instant setup
+- **[Railway](https://railway.app)** - Free tier, great for dev
+- **[Neon](https://neon.tech)** - Serverless PostgreSQL
+
+#### Option B: Local PostgreSQL
+
+```bash
+# macOS
 brew install postgresql
 brew services start postgresql
-
-# Create database
 createdb mygoogledashboard
+
+# Ubuntu/Debian
+sudo apt-get install postgresql
+sudo systemctl start postgresql
+sudo -u postgres createdb mygoogledashboard
+
+# Your DATABASE_URL will be:
+postgresql://username:password@localhost:5432/mygoogledashboard
 ```
 
-### 3. Configure Google OAuth
+### 2. Google OAuth Setup
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project or select an existing one
-3. Enable the Google+ API
-4. Go to "Credentials" → "Create Credentials" → "OAuth client ID"
-5. Choose "Web application"
-6. Add authorized JavaScript origins:
-   - `http://localhost:3000`
-7. Add authorized redirect URIs:
-   - `http://localhost:3000/api/auth/callback/google`
-8. Copy the Client ID and Client Secret
+2. Create a new project or select existing one
+3. Navigate to "APIs & Services" → "Credentials"
+4. Click "Create Credentials" → "OAuth client ID"
+5. Configure consent screen if prompted
+6. Choose "Web application"
+7. Add authorized JavaScript origins:
+   ```
+   http://localhost:3000
+   ```
+8. Add authorized redirect URIs:
+   ```
+   http://localhost:3000/api/auth/callback/google
+   ```
+9. Copy your **Client ID** and **Client Secret**
 
-### 4. Environment Variables
+### 3. Environment Variables
 
-Create a `.env` file in the root directory:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your credentials:
+Edit your `.env` file:
 
 ```env
+# Database
 DATABASE_URL="postgresql://user:password@localhost:5432/mygoogledashboard"
-NEXTAUTH_SECRET="run: openssl rand -base64 32"
+
+# NextAuth.js
+# Generate a secret: openssl rand -base64 32
+NEXTAUTH_SECRET="your-generated-secret-here"
 NEXTAUTH_URL="http://localhost:3000"
+
+# Google OAuth
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 
-Generate a secure `NEXTAUTH_SECRET`:
+**Generate NEXTAUTH_SECRET:**
 ```bash
 openssl rand -base64 32
 ```
 
-### 5. Set Up Database Schema
+### 4. Validate Configuration
 
 ```bash
-# Generate Prisma client
-npm run db:generate
-
-# Push schema to database
-npm run db:push
+npm run check:env
 ```
 
-### 6. Run the Application
+## 📜 Available Scripts
 
-```bash
-# Development mode
-npm run dev
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run dev:safe` | Start with environment validation |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run setup` | Automated setup script |
+| `npm run check:env` | Validate environment variables |
+| `npm run db:push` | Push schema to database |
+| `npm run db:generate` | Generate Prisma client |
+| `npm run db:studio` | Open Prisma Studio (database GUI) |
+| `npm run db:reset` | Reset database |
 
-# Open http://localhost:3000
-```
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run db:push` - Push Prisma schema to database
-- `npm run db:generate` - Generate Prisma client
-- `npm run db:studio` - Open Prisma Studio (database GUI)
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 mygoogledashboard/
-├── app/                      # Next.js app directory
-│   ├── api/                  # API routes
-│   │   └── auth/            # NextAuth.js routes
-│   ├── dashboard/           # Dashboard page
-│   ├── globals.css          # Global styles
-│   ├── layout.tsx           # Root layout
-│   └── page.tsx             # Home page
-├── components/              # React components
-│   └── AuthProvider.tsx     # Session provider
-├── lib/                     # Utility functions
-│   ├── auth.ts              # NextAuth configuration
-│   └── prisma.ts            # Prisma client
-├── prisma/                  # Prisma schema
-│   └── schema.prisma        # Database schema
-├── types/                   # TypeScript types
-│   └── next-auth.d.ts       # NextAuth types
-└── public/                  # Static files
+├── app/                         # Next.js app directory
+│   ├── api/                     # API routes
+│   │   └── auth/               # NextAuth.js routes
+│   ├── dashboard/              # Dashboard page
+│   │   ├── page.tsx            # Dashboard UI
+│   │   └── loading.tsx         # Loading state
+│   ├── error.tsx               # Error boundary
+│   ├── loading.tsx             # Global loading
+│   ├── layout.tsx              # Root layout
+│   ├── page.tsx                # Home/login page
+│   └── globals.css             # Global styles
+├── components/                  # React components
+│   ├── Dashboard/              # Dashboard-specific
+│   │   ├── ActivityFeed.tsx    # Activity widget
+│   │   └── QuickActions.tsx    # Quick actions widget
+│   ├── ui/                     # Reusable UI components
+│   │   ├── Card.tsx            # Card component
+│   │   └── Button.tsx          # Button component
+│   └── AuthProvider.tsx        # Session provider
+├── lib/                        # Utility libraries
+│   ├── auth.ts                 # NextAuth config
+│   └── prisma.ts               # Prisma client
+├── prisma/                     # Database
+│   └── schema.prisma           # Database schema
+├── scripts/                    # Helper scripts
+│   ├── setup.sh                # Setup automation
+│   ├── check-env.js            # Environment validator
+│   └── dev.sh                  # Safe dev start
+├── types/                      # TypeScript types
+│   └── next-auth.d.ts          # NextAuth types
+└── public/                     # Static files
 ```
 
-## Security Features
+## 🔒 Security
 
-- **OAuth 2.0**: Secure authentication via Google
-- **Session Management**: Database-backed sessions
+- **OAuth 2.0**: Industry-standard authentication
+- **Session Management**: Secure database-backed sessions
+- **Environment Variables**: Sensitive data isolated
 - **HTTPS Ready**: Production-ready security headers
-- **Environment Variables**: Sensitive data kept in .env files
+- **Type Safety**: TypeScript prevents common bugs
 
-## Future Enhancements
+## 🎨 Tech Stack
 
-This is a POC with potential for additional features:
-- Google Calendar integration
-- Gmail stats and insights
-- Google Drive usage dashboard
-- Google Analytics data
-- Customizable widgets
-- Data export functionality
+| Category | Technology |
+|----------|-----------|
+| **Framework** | Next.js 15 (App Router) |
+| **Language** | TypeScript 5.7 |
+| **UI Library** | React 19 |
+| **Styling** | Tailwind CSS 3.4 |
+| **Authentication** | NextAuth.js 4 |
+| **Database** | PostgreSQL |
+| **ORM** | Prisma 6 |
+| **Icons** | Lucide React |
+| **Linting** | ESLint 9 |
 
-## Troubleshooting
+## 🚧 Roadmap
+
+Future enhancements for this POC:
+
+- [ ] Google Calendar integration
+- [ ] Gmail stats and insights
+- [ ] Google Drive usage dashboard
+- [ ] Google Analytics data visualization
+- [ ] Customizable dashboard widgets
+- [ ] Data export functionality
+- [ ] Real-time notifications
+- [ ] Multi-language support
+- [ ] Advanced analytics
+- [ ] Mobile app
+
+## 🐛 Troubleshooting
 
 ### Database Connection Issues
-- Verify PostgreSQL is running: `brew services list`
-- Check DATABASE_URL in .env file
-- Test connection: `npm run db:studio`
+
+```bash
+# Check if PostgreSQL is running
+brew services list  # macOS
+systemctl status postgresql  # Linux
+
+# Test database connection
+npm run db:studio
+
+# If connection fails, verify DATABASE_URL in .env
+```
 
 ### Google OAuth Issues
-- Verify redirect URIs in Google Cloud Console
-- Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
-- Ensure NEXTAUTH_URL matches your development URL
+
+- ✅ Verify redirect URI matches exactly in Google Console
+- ✅ Check that both `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set
+- ✅ Ensure `NEXTAUTH_URL` matches your development URL
+- ✅ Clear browser cookies and try again
+- ✅ Check Google Cloud Console for any disabled APIs
 
 ### Build Errors
-- Clear Next.js cache: `rm -rf .next`
-- Reinstall dependencies: `rm -rf node_modules && npm install`
-- Regenerate Prisma client: `npm run db:generate`
 
-## License
+```bash
+# Clear Next.js cache
+rm -rf .next
 
-MIT
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
 
-## Support
+# Regenerate Prisma client
+npm run db:generate
+```
 
-For issues and questions, please check the troubleshooting section or create an issue in the repository.
+### Port Already in Use
+
+```bash
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
+
+# Or use a different port
+PORT=3001 npm run dev
+```
+
+## 📖 Learn More
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [NextAuth.js Documentation](https://next-auth.js.org)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs)
+
+## 🤝 Contributing
+
+This is a proof of concept project. Feel free to fork and enhance!
+
+## 📄 License
+
+MIT License - feel free to use this project for learning and development.
+
+## 💬 Support
+
+For issues and questions:
+1. Check the [Troubleshooting](#-troubleshooting) section
+2. Review the configuration steps
+3. Verify all environment variables are set correctly
+4. Check that your database is accessible
+
+---
+
+**Built with ❤️ using Next.js, TypeScript, and modern web technologies**
