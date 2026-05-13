@@ -6,8 +6,40 @@ import { AuthProvider } from "@/components/AuthProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "My Google Dashboard",
-  description: "A personal dashboard for your Google services",
+  title: {
+    default: "My Google Dashboard",
+    template: "%s | My Google Dashboard",
+  },
+  description:
+    "A modern, secure personal dashboard for managing your Google services. Built with Next.js, TypeScript, and PostgreSQL.",
+  keywords: [
+    "Google Dashboard",
+    "OAuth",
+    "Next.js",
+    "TypeScript",
+    "PostgreSQL",
+    "Personal Dashboard",
+  ],
+  authors: [{ name: "My Google Dashboard" }],
+  creator: "My Google Dashboard",
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "./",
+    title: "My Google Dashboard",
+    description: "A modern personal dashboard for your Google services",
+    siteName: "My Google Dashboard",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "My Google Dashboard",
+    description: "A modern personal dashboard for your Google services",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
