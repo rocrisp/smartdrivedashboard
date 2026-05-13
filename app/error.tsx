@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Home, RefreshCw } from "lucide-react";
+import Link from "next/link";
 
 export default function Error({
   error,
@@ -24,14 +25,35 @@ export default function Error({
           Something went wrong
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          We encountered an error while loading this page.
+          We encountered an unexpected error while loading this page. This has
+          been logged and we&apos;ll look into it.
         </p>
-        <button
-          onClick={reset}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors"
-        >
-          Try again
-        </button>
+
+        <div className="space-y-3">
+          <button
+            onClick={reset}
+            className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-5 h-5" />
+            Try again
+          </button>
+
+          <Link
+            href="/dashboard"
+            className="flex items-center justify-center gap-2 w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium px-6 py-3 rounded-lg transition-colors"
+          >
+            <Home className="w-5 h-5" />
+            Go to Dashboard
+          </Link>
+        </div>
+
+        {error.digest && (
+          <div className="mt-6 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              Error ID: {error.digest}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

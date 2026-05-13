@@ -3,12 +3,15 @@
 import { useRouter } from "next/navigation";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Settings, RefreshCw, Download, ExternalLink } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 
 export function QuickActions() {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const handleRefresh = () => {
-    window.location.reload();
+    showToast("Refreshing dashboard data...", "info");
+    setTimeout(() => window.location.reload(), 500);
   };
 
   const handleExport = async () => {
@@ -31,10 +34,14 @@ export function QuickActions() {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+
+        showToast("Data exported successfully!", "success");
+      } else {
+        showToast("Failed to export data", "error");
       }
     } catch (error) {
       console.error("Failed to export data:", error);
-      alert("Failed to export data. Please try again.");
+      showToast("Failed to export data. Please try again.", "error");
     }
   };
 

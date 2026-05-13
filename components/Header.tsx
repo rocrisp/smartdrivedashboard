@@ -12,12 +12,16 @@ export function Header() {
   if (!session) return null;
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-10">
+    <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-10" role="banner">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-3"
+              aria-label="Go to dashboard home"
+            >
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center" aria-hidden="true">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -38,7 +42,7 @@ export function Header() {
             </Link>
 
             {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-2 ml-4">
+            <nav className="hidden md:flex items-center gap-2 ml-4" aria-label="Main navigation">
               <Link
                 href="/dashboard"
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -46,8 +50,9 @@ export function Header() {
                     ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
+                aria-current={pathname === "/dashboard" ? "page" : undefined}
               >
-                <LayoutDashboard className="w-4 h-4" />
+                <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
                 Dashboard
               </Link>
               <Link
@@ -57,8 +62,9 @@ export function Header() {
                     ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
+                aria-current={pathname === "/settings" ? "page" : undefined}
               >
-                <SettingsIcon className="w-4 h-4" />
+                <SettingsIcon className="w-4 h-4" aria-hidden="true" />
                 Settings
               </Link>
             </nav>
@@ -70,6 +76,7 @@ export function Header() {
             <Link
               href="/settings"
               className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              aria-label="Settings"
             >
               <SettingsIcon className="w-5 h-5" />
             </Link>
@@ -77,8 +84,9 @@ export function Header() {
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              aria-label="Sign out of your account"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4" aria-hidden="true" />
               <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
