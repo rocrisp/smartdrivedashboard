@@ -26,27 +26,10 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("recent");
   const [allFiles, setAllFiles] = useState<DriveFile[]>([]);
   const [showBuckets, setShowBuckets] = useState(true);
-  const [collapsedWindows, setCollapsedWindows] = useState<Record<Tab, boolean>>({
-    recent: false,
-    shared: false,
-    search: false,
-    bookmarks: false,
-    history: false,
-  });
-  const [windowPositions, setWindowPositions] = useState<Record<Tab, { x: number; y: number }>>({
-    recent: { x: 50, y: 150 },
-    shared: { x: 50, y: 150 },
-    search: { x: 50, y: 150 },
-    bookmarks: { x: 50, y: 150 },
-    history: { x: 50, y: 150 },
-  });
-  const [windowSizes, setWindowSizes] = useState<Record<Tab, { width: number; height: number }>>({
-    recent: { width: 800, height: 600 },
-    shared: { width: 800, height: 600 },
-    search: { width: 800, height: 600 },
-    bookmarks: { width: 800, height: 600 },
-    history: { width: 800, height: 600 },
-  });
+  const [showFilesWindow, setShowFilesWindow] = useState(true);
+  const [filesWindowCollapsed, setFilesWindowCollapsed] = useState(false);
+  const [filesWindowPosition, setFilesWindowPosition] = useState({ x: 50, y: 150 });
+  const [filesWindowSize, setFilesWindowSize] = useState({ width: 900, height: 650 });
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -125,24 +108,12 @@ export default function Dashboard() {
   }
 
   const tabs = [
-    { id: "recent" as Tab, label: "Recently Viewed", icon: <Clock className="w-5 h-5" /> },
-    { id: "shared" as Tab, label: "Shared with Me", icon: <Users className="w-5 h-5" /> },
-    { id: "search" as Tab, label: "Search Files", icon: <Search className="w-5 h-5" /> },
-    { id: "bookmarks" as Tab, label: "Bookmarks", icon: <Star className="w-5 h-5" /> },
-    { id: "history" as Tab, label: "View History", icon: <History className="w-5 h-5" /> },
+    { id: "recent" as Tab, label: "Recently Viewed", icon: <Clock className="w-4 h-4" /> },
+    { id: "shared" as Tab, label: "Shared with Me", icon: <Users className="w-4 h-4" /> },
+    { id: "search" as Tab, label: "Search Files", icon: <Search className="w-4 h-4" /> },
+    { id: "bookmarks" as Tab, label: "Bookmarks", icon: <Star className="w-4 h-4" /> },
+    { id: "history" as Tab, label: "View History", icon: <History className="w-4 h-4" /> },
   ];
-
-  const toggleWindow = (tab: Tab) => {
-    setCollapsedWindows(prev => ({ ...prev, [tab]: !prev[tab] }));
-  };
-
-  const handlePositionChange = (tab: Tab, position: { x: number; y: number }) => {
-    setWindowPositions(prev => ({ ...prev, [tab]: position }));
-  };
-
-  const handleSizeChange = (tab: Tab, size: { width: number; height: number }) => {
-    setWindowSizes(prev => ({ ...prev, [tab]: size }));
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -152,123 +123,78 @@ export default function Dashboard() {
       <main id="main-content" className="flex-1 relative" role="main">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Window Controls */}
-          <div className="mb-6 flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2">
-              <FolderOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Windows</h2>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    if (collapsedWindows[tab.id]) {
-                      toggleWindow(tab.id);
-                    }
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    activeTab === tab.id && !collapsedWindows[tab.id]
-                      ? "bg-blue-600 text-white"
-                      : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                  }`}
-                >
-                  {tab.icon}
-                  <span className="text-sm">{tab.label}</span>
-                </button>
-              ))}
-              <button
-                onClick={() => setShowBuckets(!showBuckets)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                  showBuckets
-                    ? "bg-purple-600 text-white"
-                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                }`}
-              >
-                <FolderOpen className="w-4 h-4" />
-                <span className="text-sm">Virtual Buckets</span>
-              </button>
-            </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Windows</h2>
+            <button
+              onClick={() => setShowFilesWindow(!showFilesWindow)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                showFilesWindow
+                  ? "bg-blue-600 text-white"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
+              }`}
+            >
+              <Search className="w-4 h-4" />
+              <span className="text-sm">Files</span>
+            </button>
+            <button
+              onClick={() => setShowBuckets(!showBuckets)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                showBuckets
+                  ? "bg-purple-600 text-white"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
+              }`}
+            >
+              <FolderOpen className="w-4 h-4" />
+              <span className="text-sm">Virtual Buckets</span>
+            </button>
           </div>
         </div>
 
-        {/* Floating Windows */}
-        {activeTab === "recent" && (
+        {/* Files Window with Tabs */}
+        {showFilesWindow && (
           <FloatingWindow
-            title="Recently Viewed"
-            icon={<Clock className="w-5 h-5" />}
-            defaultPosition={windowPositions.recent}
-            defaultSize={windowSizes.recent}
-            isCollapsed={collapsedWindows.recent}
-            onToggleCollapse={() => toggleWindow("recent")}
-            onPositionChange={(pos) => handlePositionChange("recent", pos)}
-            onSizeChange={(size) => handleSizeChange("recent", size)}
-          >
-            <RecentlyViewed />
-          </FloatingWindow>
-        )}
-
-        {activeTab === "shared" && (
-          <FloatingWindow
-            title="Shared with Me"
-            icon={<Users className="w-5 h-5" />}
-            defaultPosition={windowPositions.shared}
-            defaultSize={windowSizes.shared}
-            isCollapsed={collapsedWindows.shared}
-            onToggleCollapse={() => toggleWindow("shared")}
-            onPositionChange={(pos) => handlePositionChange("shared", pos)}
-            onSizeChange={(size) => handleSizeChange("shared", size)}
-          >
-            <SharedWithMe />
-          </FloatingWindow>
-        )}
-
-        {activeTab === "search" && (
-          <FloatingWindow
-            title="Search Files"
+            title="Files"
             icon={<Search className="w-5 h-5" />}
-            defaultPosition={windowPositions.search}
-            defaultSize={windowSizes.search}
-            isCollapsed={collapsedWindows.search}
-            onToggleCollapse={() => toggleWindow("search")}
-            onPositionChange={(pos) => handlePositionChange("search", pos)}
-            onSizeChange={(size) => handleSizeChange("search", size)}
+            defaultPosition={filesWindowPosition}
+            defaultSize={filesWindowSize}
+            onClose={() => setShowFilesWindow(false)}
+            isCollapsed={filesWindowCollapsed}
+            onToggleCollapse={() => setFilesWindowCollapsed(!filesWindowCollapsed)}
+            onPositionChange={setFilesWindowPosition}
+            onSizeChange={setFilesWindowSize}
           >
-            <FileSearch />
+            {/* Tabs inside window */}
+            <div className="border-b border-gray-200 dark:border-gray-700">
+              <div className="flex overflow-x-auto">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-3 font-medium transition-all whitespace-nowrap border-b-2 ${
+                      activeTab === tab.id
+                        ? "border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                        : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                    }`}
+                  >
+                    {tab.icon}
+                    <span className="text-sm">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="p-4">
+              {activeTab === "recent" && <RecentlyViewed />}
+              {activeTab === "shared" && <SharedWithMe />}
+              {activeTab === "search" && <FileSearch />}
+              {activeTab === "bookmarks" && <BookmarkedFiles />}
+              {activeTab === "history" && <ViewHistory />}
+            </div>
           </FloatingWindow>
         )}
 
-        {activeTab === "bookmarks" && (
-          <FloatingWindow
-            title="Bookmarks"
-            icon={<Star className="w-5 h-5" />}
-            defaultPosition={windowPositions.bookmarks}
-            defaultSize={windowSizes.bookmarks}
-            isCollapsed={collapsedWindows.bookmarks}
-            onToggleCollapse={() => toggleWindow("bookmarks")}
-            onPositionChange={(pos) => handlePositionChange("bookmarks", pos)}
-            onSizeChange={(size) => handleSizeChange("bookmarks", size)}
-          >
-            <BookmarkedFiles />
-          </FloatingWindow>
-        )}
-
-        {activeTab === "history" && (
-          <FloatingWindow
-            title="View History"
-            icon={<History className="w-5 h-5" />}
-            defaultPosition={windowPositions.history}
-            defaultSize={windowSizes.history}
-            isCollapsed={collapsedWindows.history}
-            onToggleCollapse={() => toggleWindow("history")}
-            onPositionChange={(pos) => handlePositionChange("history", pos)}
-            onSizeChange={(size) => handleSizeChange("history", size)}
-          >
-            <ViewHistory />
-          </FloatingWindow>
-        )}
-
-        {/* Collections Floating Window */}
+        {/* Virtual Buckets Window */}
         <CollectionsSidebar
           allFiles={allFiles}
           isVisible={showBuckets}

@@ -2,13 +2,27 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { LogOut, Settings as SettingsIcon, LayoutDashboard, Shield } from "lucide-react";
+import { LogOut, Settings as SettingsIcon, LayoutDashboard, Shield, ChevronDown, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "./ThemeToggle";
+import { useState, useRef, useEffect } from "react";
 
 export function Header() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   if (!session) return null;
 
@@ -56,55 +70,70 @@ export function Header() {
                 <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
                 Dashboard
               </Link>
-              <Link
-                href="/settings"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  pathname === "/settings"
-                    ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-                aria-current={pathname === "/settings" ? "page" : undefined}
-              >
-                <SettingsIcon className="w-4 h-4" aria-hidden="true" />
-                Settings
-              </Link>
-              <Link
-                href="/sessions"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  pathname === "/sessions"
-                    ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-                aria-current={pathname === "/sessions" ? "page" : undefined}
-              >
-                <Shield className="w-4 h-4" aria-hidden="true" />
-                Sessions
-              </Link>
             </nav>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {/* Mobile navigation */}
-            <Link
-              href="/settings"
-              className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              aria-label="Settings"
-            >
-              <SettingsIcon className="w-5 h-5" />
-            </Link>
-
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            <button
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              aria-label="Sign out of your account"
-            >
-              <LogOut className="w-4 h-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Sign Out</span>
-            </button>
+            {/* User Menu */}
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                aria-label="User menu"
+              >
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline">{session.user?.name || session.user?.email}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+                  <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {session.user?.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {session.user?.email}
+                    </p>
+                  </div>
+                  <div className="py-1">
+                    <Link
+                      href="/settings"
+                      onClick={() => setShowUserMenu(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <SettingsIcon className="w-4 h-4" />
+                      Settings
+                    </Link>
+                    <Link
+                      href="/sessions"
+                      onClick={() => setShowUserMenu(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <Shield className="w-4 h-4" />
+                      Sessions
+                    </Link>
+                  </div>
+                  <div className="border-t border-gray-200 dark:border-gray-700 py-1">
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        signOut({ callbackUrl: "/" });
+                      }}
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
