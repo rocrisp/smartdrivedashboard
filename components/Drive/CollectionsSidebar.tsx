@@ -21,12 +21,13 @@ export function CollectionsSidebar({ allFiles, onFileRemove, isVisible, onClose 
   const [selectedCollection, setSelectedCollection] = useState<SmartCollection | null>(null);
   const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set());
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [defaultPosition, setDefaultPosition] = useState({ x: 100, y: 100 });
+  const [position, setPosition] = useState({ x: 100, y: 100 });
+  const [size, setSize] = useState({ width: 380, height: 600 });
 
   useEffect(() => {
     loadCollections();
     if (typeof window !== 'undefined') {
-      setDefaultPosition({ x: window.innerWidth - 450, y: 100 });
+      setPosition({ x: window.innerWidth - 450, y: 100 });
     }
   }, []);
 
@@ -101,11 +102,13 @@ export function CollectionsSidebar({ allFiles, onFileRemove, isVisible, onClose 
       <FloatingWindow
         title="Virtual Buckets"
         icon={<FolderOpen className="w-5 h-5" />}
-        defaultPosition={defaultPosition}
-        defaultSize={{ width: 380, height: 600 }}
+        defaultPosition={position}
+        defaultSize={size}
         onClose={onClose}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        onPositionChange={setPosition}
+        onSizeChange={setSize}
       >
         {/* Header Actions */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">

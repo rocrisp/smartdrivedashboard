@@ -63,6 +63,8 @@ export default function RootLayout({
                   const effectiveTheme = theme === 'system' ? systemTheme : theme;
                   if (effectiveTheme === 'dark') {
                     document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
                   }
                 } catch (e) {}
               })();
