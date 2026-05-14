@@ -258,4 +258,4 @@ export const INTELLIGENCE_KEYS = {
  * Schema version for data migrations
  * Increment this whenever you change the data structure
  */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = '1.0.0';
