@@ -6,13 +6,14 @@
 /**
  * Problem types for poorly-named files
  */
-export type ProblemType =
-  | 'generic'
-  | 'messy-versioning'
-  | 'too-many-numbers'
-  | 'all-caps'
-  | 'all-lowercase'
-  | 'no-delimiters';
+export type FilenameProblemType =
+  | 'multiple-copies'
+  | 'version-mess'
+  | 'untitled'
+  | 'date-version'
+  | 'too-long'
+  | 'too-generic'
+  | null;
 
 export class PatternAnalyzer {
   /**
@@ -168,51 +169,26 @@ export class PatternAnalyzer {
   }
 
   /**
-   * Detect filename problems (poor naming patterns)
-   * Returns array of problem types detected
+   * Check if a filename has quality issues
    */
-  static detectFilenameProblems(filename: string): ProblemType[] {
-    if (!filename) return [];
-
-    const problems: ProblemType[] = [];
-
-    if (this.hasGenericName(filename)) {
-      problems.push('generic');
-    }
-
-    if (this.hasMessyVersioning(filename)) {
-      problems.push('messy-versioning');
-    }
-
-    if (this.hasTooManyNumbers(filename)) {
-      problems.push('too-many-numbers');
-    }
-
-    const caseProblems = this.isAllCapsOrLowercase(filename);
-    if (caseProblems === 'all-caps') {
-      problems.push('all-caps');
-    } else if (caseProblems === 'all-lowercase') {
-      problems.push('all-lowercase');
-    }
-
-    if (this.lacksDelimiters(filename)) {
-      problems.push('no-delimiters');
-    }
-
-    return problems;
-  }
-
-  /**
-   * Check if filename has a generic name
-   * Detects: document, file, untitled, new, copy patterns
-   */
-  static hasGenericName(filename: string): boolean {
+  static isNamePoor(filename: string): boolean {
     if (!filename) return false;
 
+    // Remove extension for analysis
     const name = filename.replace(/\.[^/.]+$/, '');
 
-    // Check for generic patterns: /^(document|file|untitled|new|copy)/i
-    if (/^(document|file|untitled|new|copy)/i.test(name)) {
+    // Too many underscores/hyphens (> 5 segments)
+    if (name.split(/[_-]/).length > 5) return true;
+
+    // Multiple "final" or "copy" keywords (>= 2 occurrences)
+    const finalCopyCount = (name.match(/(final|copy)/gi) || []).length;
+    if (finalCopyCount >= 2) return true;
+
+    // Very long filename (50+ characters)
+    if (name.length > 50) return true;
+
+    // Too short and generic (< 10 chars and starts with common generic words)
+    if (name.length < 10 && /^(doc|file|new|untitled)/i.test(name)) {
       return true;
     }
 
@@ -220,139 +196,74 @@ export class PatternAnalyzer {
   }
 
   /**
-   * Check if filename has messy versioning
-   * Detects: (1), [1], copy X patterns
+   * Detect specific problem pattern in filename
+   * Returns problem type or null if filename is acceptable
    */
-  static hasMessyVersioning(filename: string): boolean {
-    if (!filename) return false;
-
-    // Check for messy versioning patterns: /\(([\d]+)\)|\[[\d]+\]|copy\s*\d+/i
-    if (/\([\d]+\)/.test(filename)) return true;
-    if (/\[[\d]+\]/.test(filename)) return true;
-    if (/copy\s*\d+/i.test(filename)) return true;
-
-    return false;
-  }
-
-  /**
-   * Check if filename has too many numbers
-   * More than 50% of non-whitespace chars are digits
-   */
-  static hasTooManyNumbers(filename: string): boolean {
-    if (!filename) return false;
-
-    const name = filename.replace(/\.[^/.]+$/, '');
-    const noSpaces = name.replace(/\s+/g, '');
-
-    if (noSpaces.length === 0) return false;
-
-    const digitCount = (noSpaces.match(/\d/g) || []).length;
-    const digitRatio = digitCount / noSpaces.length;
-
-    // More than 50% numbers
-    return digitRatio > 0.5;
-  }
-
-  /**
-   * Check if filename is all caps or all lowercase
-   * Returns 'all-caps', 'all-lowercase', or null
-   */
-  static isAllCapsOrLowercase(filename: string): 'all-caps' | 'all-lowercase' | null {
+  static detectProblemPattern(filename: string): FilenameProblemType {
     if (!filename) return null;
 
-    const name = filename.replace(/\.[^/.]+$/, '');
-    const noSpaces = name.replace(/\s+/g, '');
-
-    if (noSpaces.length === 0) return null;
-
-    // Filter out non-letter characters for case check
-    const lettersOnly = noSpaces.replace(/[^a-zA-Z]/g, '');
-
-    if (lettersOnly.length === 0) return null;
-
-    if (lettersOnly === lettersOnly.toUpperCase()) {
-      return 'all-caps';
+    // Pattern 1: Multiple "Copy of" prefixes
+    if (/^(Copy of )+/i.test(filename)) {
+      const matches = filename.match(/Copy of/gi);
+      if (matches && matches.length >= 2) {
+        return 'multiple-copies';
+      }
     }
 
-    if (lettersOnly === lettersOnly.toLowerCase()) {
-      return 'all-lowercase';
+    // Pattern 2: Version mess (multiple final/version indicators)
+    // Check for multiple "final" keywords
+    const finalMatches = filename.match(/final/gi);
+    if (finalMatches && finalMatches.length >= 2) {
+      return 'version-mess';
+    }
+    // Check for multiple version numbers
+    if (/v\d+.*v\d+/i.test(filename)) {
+      return 'version-mess';
+    }
+
+    // Pattern 3: Untitled documents
+    if (/^Untitled (document|spreadsheet|presentation)/i.test(filename)) {
+      return 'untitled';
+    }
+
+    // Pattern 4: Date-version pattern (20240115_doc_v2)
+    if (/\d{8}_\w+_v\d+/.test(filename)) {
+      return 'date-version';
+    }
+
+    // Pattern 5: Too long
+    const name = filename.replace(/\.[^/.]+$/, '');
+    if (name.length > 50) {
+      return 'too-long';
+    }
+
+    // Pattern 6: Too generic
+    if (name.length < 10 && /^(doc|file|new)/i.test(name)) {
+      return 'too-generic';
     }
 
     return null;
   }
 
   /**
-   * Check if filename lacks proper delimiters
-   * No spaces, underscores, hyphens (except camelCase)
+   * Get human-readable explanation for a problem pattern
    */
-  static lacksDelimiters(filename: string): boolean {
-    if (!filename) return false;
-
-    const name = filename.replace(/\.[^/.]+$/, '');
-
-    // Has spaces, underscores, or hyphens
-    if (/[\s_-]/.test(name)) {
-      return false;
+  static getProblemExplanation(problemType: FilenameProblemType): string {
+    switch (problemType) {
+      case 'multiple-copies':
+        return 'Multiple "Copy of" prefixes make the name unclear';
+      case 'version-mess':
+        return 'Too many version indicators (final, v1, v2, etc.)';
+      case 'untitled':
+        return 'Generic "Untitled" name without context';
+      case 'date-version':
+        return 'Technical date-version format is hard to read';
+      case 'too-long':
+        return 'Filename is too long (50+ characters)';
+      case 'too-generic':
+        return 'Generic name like "doc" or "file" needs context';
+      default:
+        return 'Filename could be improved';
     }
-
-    // Check for camelCase (has uppercase letters for word boundaries)
-    if (/[a-z][A-Z]/.test(name)) {
-      return false;
-    }
-
-    // No delimiters and not camelCase
-    return true;
-  }
-
-  /**
-   * Suggest a better filename based on detected problems
-   * Uses keywords to generate improvements
-   * Returns null if filename is already good
-   */
-  static suggestBetterName(filename: string, keywords: string[]): string | null {
-    if (!filename) return null;
-
-    const problems = this.detectFilenameProblems(filename);
-
-    // If no problems detected, no suggestion needed
-    if (problems.length === 0) return null;
-
-    // Get extension
-    const extension = filename.match(/\.[^/.]+$/)?.[0] || '';
-    const name = filename.replace(/\.[^/.]+$/, '');
-
-    let improved = name;
-    let changed = false;
-
-    // Handle "Copy of" prefix removal
-    const beforeCopyRemoval = improved;
-    improved = improved.replace(/^Copy of\s+/i, '');
-    if (improved !== beforeCopyRemoval) {
-      changed = true;
-    }
-
-    // Remove version indicators if detected
-    if (problems.includes('messy-versioning')) {
-      const beforeVersionRemoval = improved;
-      improved = improved.replace(/\s*\(\d+\)/g, '');
-      improved = improved.replace(/\s*\[\d+\]/g, '');
-      improved = improved.replace(/\s*copy\s*\d+/i, '');
-      if (improved !== beforeVersionRemoval) {
-        changed = true;
-      }
-    }
-
-    // If we have meaningful keywords and detected a generic name problem, use them
-    if (keywords.length > 0 && problems.includes('generic')) {
-      improved = this.generateNameFromKeywords(keywords);
-      changed = true;
-    }
-
-    // If nothing changed or result is empty, return null
-    if (!changed || !improved || improved === name) {
-      return null;
-    }
-
-    return improved + extension;
   }
 }
