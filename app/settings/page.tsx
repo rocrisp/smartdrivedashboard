@@ -12,6 +12,8 @@ import {
   Save,
   Globe,
   Clock,
+  Sparkles,
+  Database,
 } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Header } from "@/components/Header";
@@ -19,6 +21,7 @@ import { Footer } from "@/components/Footer";
 import { FloatingHelpButton } from "@/components/FloatingHelpButton";
 import { useToast } from "@/components/ui/Toast";
 import { UserProfileCard } from "@/components/Dashboard/UserProfileCard";
+import { IntelligenceManager } from "@/lib/intelligence/intelligence-manager";
 
 interface UserPreferences {
   emailNotifications: boolean;
@@ -38,6 +41,14 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [intelligenceEnabled, setIntelligenceEnabled] = useState(true);
+  const [intelligenceInfo, setIntelligenceInfo] = useState<{
+    sizeBytes: number;
+    sizeKB: number;
+    sizeMB: number;
+    lastAnalysis: string | null;
+    enabled: boolean;
+  } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -48,9 +59,24 @@ export default function Settings() {
   useEffect(() => {
     if (session?.user) {
       fetchPreferences();
+      loadIntelligenceInfo();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
+
+  const loadIntelligenceInfo = () => {
+    try {
+      const info = IntelligenceManager.getStorageInfo();
+      const enabled = IntelligenceManager.isEnabled();
+      setIntelligenceInfo({
+        ...info,
+        lastAnalysis: info.lastAnalysis || null
+      });
+      setIntelligenceEnabled(enabled);
+    } catch (error) {
+      console.error('Failed to load intelligence info:', error);
+    }
+  };
 
   const fetchPreferences = async () => {
     try {
@@ -123,6 +149,31 @@ export default function Settings() {
       console.error("Failed to delete account:", error);
       showToast("Failed to delete account. Please try again.", "error");
       setDeleting(false);
+    }
+  };
+
+  const toggleIntelligence = () => {
+    try {
+      if (intelligenceEnabled) {
+        IntelligenceManager.disable();
+        showToast("Intelligence features disabled", "success");
+      } else {
+        IntelligenceManager.enable();
+        showToast("Intelligence features enabled", "success");
+      }
+      loadIntelligenceInfo();
+    } catch (error) {
+      showToast("Failed to toggle intelligence features", "error");
+    }
+  };
+
+  const resetIntelligence = () => {
+    try {
+      IntelligenceManager.reset();
+      loadIntelligenceInfo();
+      showToast("Intelligence data reset successfully", "success");
+    } catch (error) {
+      showToast("Failed to reset intelligence data", "error");
     }
   };
 
@@ -306,6 +357,75 @@ export default function Settings() {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
               </label>
             </div>
+          </div>
+        </Card>
+
+        {/* Intelligence Features */}
+        <Card className="mb-6">
+          <CardHeader
+            icon={
+              <Sparkles className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+            }
+            title="Intelligence Features"
+            iconBgColor="bg-indigo-100 dark:bg-indigo-900"
+          />
+          <div className="space-y-4">
+            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+              <p className="text-sm text-indigo-800 dark:text-indigo-300 mb-2">
+                <strong>Phase 1 Active:</strong> Intelligence foundation is running.
+                Keyword extraction and filename problem detection are ready.
+              </p>
+              <p className="text-xs text-indigo-600 dark:text-indigo-400">
+                Phase 2 features (Smart Projects, Suggestions, Sessions, Labels) coming soon!
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div>
+                <h4 className="font-medium text-gray-900 dark:text-white">
+                  Enable Intelligence Analysis
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Process files for smart organization and insights
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={intelligenceEnabled}
+                  onChange={toggleIntelligence}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+              </label>
+            </div>
+
+            {intelligenceInfo && (
+              <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg flex-shrink-0">
+                  <Database className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-1">
+                    Storage Usage
+                  </h4>
+                  <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                    <p>Size: {intelligenceInfo.sizeKB.toFixed(2)} KB ({intelligenceInfo.sizeBytes} bytes)</p>
+                    {intelligenceInfo.lastAnalysis && (
+                      <p className="text-xs">Last analysis: {new Date(intelligenceInfo.lastAnalysis).toLocaleString()}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={resetIntelligence}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Clear Intelligence Data
+            </button>
           </div>
         </Card>
 
