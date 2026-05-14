@@ -8,14 +8,15 @@ import { RecentlyViewed } from "@/components/Drive/RecentlyViewed";
 import { FileSearch } from "@/components/Drive/FileSearch";
 import { BookmarkedFiles } from "@/components/Drive/BookmarkedFiles";
 import { ViewHistory } from "@/components/Drive/ViewHistory";
+import { Collections } from "@/components/Drive/Collections";
 import { FloatingHelpButton } from "@/components/FloatingHelpButton";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Clock, Users, Search, Star, History } from "lucide-react";
+import { Clock, Users, Search, Star, History, FolderOpen } from "lucide-react";
 import { IntelligenceManager } from "@/lib/intelligence/intelligence-manager";
 
-type Tab = "recent" | "shared" | "search" | "bookmarks" | "history";
+type Tab = "recent" | "shared" | "search" | "bookmarks" | "history" | "collections";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -85,6 +86,7 @@ export default function Dashboard() {
     { id: "recent" as Tab, label: "Recently Viewed", icon: <Clock className="w-5 h-5" /> },
     { id: "shared" as Tab, label: "Shared with Me", icon: <Users className="w-5 h-5" /> },
     { id: "search" as Tab, label: "Search Files", icon: <Search className="w-5 h-5" /> },
+    { id: "collections" as Tab, label: "My Buckets", icon: <FolderOpen className="w-5 h-5" /> },
     { id: "bookmarks" as Tab, label: "Bookmarks", icon: <Star className="w-5 h-5" /> },
     { id: "history" as Tab, label: "View History", icon: <History className="w-5 h-5" /> },
   ];
@@ -120,6 +122,7 @@ export default function Dashboard() {
           {activeTab === "recent" && <RecentlyViewed />}
           {activeTab === "shared" && <SharedWithMe />}
           {activeTab === "search" && <FileSearch />}
+          {activeTab === "collections" && <Collections />}
           {activeTab === "bookmarks" && <BookmarkedFiles />}
           {activeTab === "history" && <ViewHistory />}
         </div>
