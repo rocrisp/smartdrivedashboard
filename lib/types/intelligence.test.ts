@@ -4,7 +4,13 @@ import {
   SmartLabel,
   FilenameSuggestion,
   SmartCollection,
-  IntelligenceState
+  IntelligenceState,
+  ProjectsData,
+  SuggestionsData,
+  SessionsData,
+  LabelsData,
+  CollectionsData,
+  SCHEMA_VERSION
 } from './intelligence';
 
 describe('Intelligence Types', () => {
@@ -72,5 +78,182 @@ describe('Intelligence Types', () => {
     };
 
     expect(collection.suggestedFileIds).toHaveLength(1);
+  });
+});
+
+// ============================================================================
+// EDGE CASE TESTS
+// ============================================================================
+
+describe('Intelligence Types - Edge Cases', () => {
+  describe('Confidence Range Validation', () => {
+    it('should accept confidence at minimum boundary (0)', () => {
+      const project: DetectedProject = {
+        id: 'proj-1',
+        name: 'Low Confidence Project',
+        keywords: ['test'],
+        fileIds: [],
+        confidence: 0,
+        keyPeople: [],
+        lastActivity: new Date().toISOString(),
+        dismissed: false,
+      };
+
+      expect(project.confidence).toBe(0);
+    });
+
+    it('should accept confidence at maximum boundary (1)', () => {
+      const project: DetectedProject = {
+        id: 'proj-2',
+        name: 'High Confidence Project',
+        keywords: ['test'],
+        fileIds: [],
+        confidence: 1,
+        keyPeople: [],
+        lastActivity: new Date().toISOString(),
+        dismissed: false,
+      };
+
+      expect(project.confidence).toBe(1);
+    });
+
+    it('should accept confidence in mid-range (0.5)', () => {
+      const project: DetectedProject = {
+        id: 'proj-3',
+        name: 'Medium Confidence Project',
+        keywords: ['test'],
+        fileIds: [],
+        confidence: 0.5,
+        keyPeople: [],
+        lastActivity: new Date().toISOString(),
+        dismissed: false,
+      };
+
+      expect(project.confidence).toBe(0.5);
+    });
+  });
+
+  describe('Theme Literal Type Validation', () => {
+    it('should accept all valid theme values', () => {
+      const themes: Array<'blue' | 'purple' | 'green' | 'red' | 'orange' | 'gray'> = [
+        'blue',
+        'purple',
+        'green',
+        'red',
+        'orange',
+        'gray',
+      ];
+
+      themes.forEach((theme) => {
+        const collection: SmartCollection = {
+          id: `coll-${theme}`,
+          name: `${theme} collection`,
+          fileIds: [],
+          suggestedFileIds: [],
+          createdAt: new Date().toISOString(),
+          isBookmarked: false,
+          profile: {
+            theme,
+            isCollapsed: false,
+          },
+        };
+
+        expect(collection.profile?.theme).toBe(theme);
+      });
+    });
+  });
+
+  describe('Empty Arrays Handling', () => {
+    it('should handle empty project files', () => {
+      const projectsData: ProjectsData = {
+        projects: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      expect(projectsData.projects).toHaveLength(0);
+    });
+
+    it('should handle empty suggestions', () => {
+      const suggestionsData: SuggestionsData = {
+        suggestions: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      expect(suggestionsData.suggestions).toHaveLength(0);
+    });
+
+    it('should handle empty sessions', () => {
+      const sessionsData: SessionsData = {
+        sessions: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      expect(sessionsData.sessions).toHaveLength(0);
+    });
+
+    it('should handle empty labels', () => {
+      const labelsData: LabelsData = {
+        labels: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      expect(labelsData.labels).toHaveLength(0);
+    });
+
+    it('should handle empty collections', () => {
+      const collectionsData: CollectionsData = {
+        collections: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      expect(collectionsData.collections).toHaveLength(0);
+    });
+  });
+
+  describe('Schema Version Type Consistency', () => {
+    it('should use string schema version in all data types', () => {
+      expect(typeof SCHEMA_VERSION).toBe('string');
+
+      const projectsData: ProjectsData = {
+        projects: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      const suggestionsData: SuggestionsData = {
+        suggestions: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      const sessionsData: SessionsData = {
+        sessions: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      const labelsData: LabelsData = {
+        labels: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      const collectionsData: CollectionsData = {
+        collections: [],
+        lastComputed: new Date().toISOString(),
+        schemaVersion: SCHEMA_VERSION,
+      };
+
+      expect(projectsData.schemaVersion).toBe('1.0.0');
+      expect(suggestionsData.schemaVersion).toBe('1.0.0');
+      expect(sessionsData.schemaVersion).toBe('1.0.0');
+      expect(labelsData.schemaVersion).toBe('1.0.0');
+      expect(collectionsData.schemaVersion).toBe('1.0.0');
+    });
   });
 });

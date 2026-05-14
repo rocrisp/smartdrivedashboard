@@ -3,7 +3,7 @@
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Shield, Activity, Zap, Lock } from "lucide-react";
+import { Shield, Search, Clock, Users } from "lucide-react";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -28,24 +28,24 @@ export default function Home() {
 
   const features = [
     {
+      icon: <Search className="w-6 h-6" />,
+      title: "Find Files Easily",
+      description: "Never lose track of shared documents again",
+    },
+    {
+      icon: <Users className="w-6 h-6" />,
+      title: "See Who Shared What",
+      description: "Organize files by collaborator and sharer",
+    },
+    {
+      icon: <Clock className="w-6 h-6" />,
+      title: "Recently Viewed",
+      description: "Quick access to files you've viewed recently",
+    },
+    {
       icon: <Shield className="w-6 h-6" />,
-      title: "Secure Authentication",
-      description: "Google OAuth 2.0 for maximum security",
-    },
-    {
-      icon: <Activity className="w-6 h-6" />,
-      title: "Real-time Activity",
-      description: "Track all your actions and events",
-    },
-    {
-      icon: <Zap className="w-6 h-6" />,
-      title: "Lightning Fast",
-      description: "Built with Next.js 15 and React 19",
-    },
-    {
-      icon: <Lock className="w-6 h-6" />,
-      title: "Privacy First",
-      description: "Your data stays secure and private",
+      title: "Secure & Private",
+      description: "Read-only access via Google OAuth 2.0",
     },
   ];
 
@@ -79,8 +79,8 @@ export default function Home() {
             My Google Dashboard
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            A modern, secure personal dashboard for managing your Google services.
-            Track activities, view statistics, and manage your account all in one place.
+            A better way to find and organize your Google Drive files.
+            See files shared with you, track recently viewed documents, and never lose track of important files again.
           </p>
 
           {/* Sign In Card */}

@@ -1,350 +1,507 @@
 # Deployment Guide
 
-This guide covers deploying My Google Dashboard to various hosting platforms.
+This guide walks you through deploying My Google Dashboard to production environments.
 
-## Prerequisites
+## Table of Contents
 
-Before deploying, ensure you have:
-- ✅ A PostgreSQL database (production)
-- ✅ Google OAuth credentials configured for your production domain
-- ✅ All environment variables ready
+- [Vercel Deployment (Recommended)](#vercel-deployment-recommended)
+- [Railway Deployment](#railway-deployment)
+- [Docker Deployment](#docker-deployment)
+- [Environment Variables](#environment-variables)
+- [Post-Deployment Steps](#post-deployment-steps)
+- [Troubleshooting](#troubleshooting)
 
-## 🚀 Vercel (Recommended)
+---
 
-Vercel is the easiest way to deploy Next.js applications and is created by the Next.js team.
+## Vercel Deployment (Recommended)
 
-### Step 1: Prepare Your Database
+Vercel is the recommended platform for deploying Next.js applications. It offers seamless integration, automatic deployments, and excellent performance.
 
-Use a cloud PostgreSQL provider:
-- [Supabase](https://supabase.com) - Free tier available
-- [Neon](https://neon.tech) - Serverless PostgreSQL
-- [Railway](https://railway.app) - Simple deployment
+### Prerequisites
 
-### Step 2: Update Google OAuth
+- GitHub account
+- Vercel account ([Sign up](https://vercel.com/signup))
+- PostgreSQL database (see [Database Setup](#database-setup))
+- Google OAuth credentials configured
+
+### Step 1: Prepare Your Repository
+
+```bash
+# Ensure all changes are committed
+git add .
+git commit -m "Prepare for deployment"
+git push origin main
+```
+
+### Step 2: Import to Vercel
+
+1. Go to [vercel.com](https://vercel.com)
+2. Click **"Add New Project"**
+3. Import your GitHub repository
+4. Vercel will auto-detect Next.js settings
+
+### Step 3: Configure Environment Variables
+
+In the Vercel dashboard, add these environment variables:
+
+#### Required Variables
+
+```env
+# Database
+DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
+
+# NextAuth.js
+NEXTAUTH_SECRET=your-production-secret-key
+NEXTAUTH_URL=https://your-app.vercel.app
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+**Important:**
+- Generate a new `NEXTAUTH_SECRET` for production: `openssl rand -base64 32`
+- Use the Vercel-provided URL for `NEXTAUTH_URL`
+- Enable SSL mode for PostgreSQL connection string
+
+### Step 4: Update Google OAuth Settings
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Navigate to your OAuth credentials
-3. Add your Vercel domain to authorized origins:
+2. Navigate to **Credentials**
+3. Edit your OAuth 2.0 Client ID
+4. Add to **Authorized JavaScript origins**:
    ```
    https://your-app.vercel.app
    ```
-4. Add callback URL:
+5. Add to **Authorized redirect URIs**:
    ```
    https://your-app.vercel.app/api/auth/callback/google
    ```
 
-### Step 3: Deploy to Vercel
+### Step 5: Deploy
 
-#### Option A: Using Vercel CLI
+Click **"Deploy"** in Vercel. The deployment will:
+1. Install dependencies
+2. Run Prisma generate
+3. Build the Next.js application
+4. Deploy to production
 
-```bash
-# Install Vercel CLI
-npm i -g vercel
+### Step 6: Database Migration
 
-# Login to Vercel
-vercel login
-
-# Deploy
-vercel
-
-# Follow the prompts to configure your project
-```
-
-#### Option B: Using GitHub Integration
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Click "New Project"
-4. Import your GitHub repository
-5. Configure environment variables:
-   ```
-   DATABASE_URL=<your-production-database-url>
-   NEXTAUTH_SECRET=<generate-new-secret>
-   NEXTAUTH_URL=https://your-app.vercel.app
-   GOOGLE_CLIENT_ID=<your-google-client-id>
-   GOOGLE_CLIENT_SECRET=<your-google-client-secret>
-   ```
-6. Click "Deploy"
-
-### Step 4: Push Database Schema
+After deployment, push the database schema:
 
 ```bash
-# After deployment, push your schema to production database
-DATABASE_URL="<production-url>" npx prisma db push
+# Set the production DATABASE_URL
+export DATABASE_URL="postgresql://user:password@host:5432/database"
+
+# Push schema to production database
+npx prisma db push
 ```
 
-## 🐳 Docker
+### Step 7: Verify Deployment
 
-### Build Docker Image
+1. Visit your deployed URL
+2. Test Google OAuth login
+3. Check dashboard functionality
+4. Verify database connectivity at `/api/health`
 
-Create a `Dockerfile`:
+---
+
+## Database Setup
+
+### Option 1: Supabase (Recommended for Vercel)
+
+1. Create account at [supabase.com](https://supabase.com)
+2. Create new project
+3. Go to **Settings** → **Database**
+4. Copy the **Connection String** (Session mode)
+5. Enable **SSL mode** by appending `?sslmode=require`
+
+Example:
+```
+postgresql://postgres:password@db.xxx.supabase.co:5432/postgres?sslmode=require
+```
+
+### Option 2: Railway
+
+1. Sign up at [railway.app](https://railway.app)
+2. Create new project
+3. Add **PostgreSQL** service
+4. Copy connection string from **Connect** tab
+5. Use in `DATABASE_URL` environment variable
+
+### Option 3: Neon
+
+1. Sign up at [neon.tech](https://neon.tech)
+2. Create new project
+3. Copy connection string
+4. Neon automatically includes SSL mode
+
+---
+
+## Railway Deployment
+
+Railway offers a simple deployment process with built-in PostgreSQL.
+
+### Quick Deploy
+
+1. Go to [railway.app](https://railway.app)
+2. Click **"New Project"** → **"Deploy from GitHub repo"**
+3. Select your repository
+4. Add **PostgreSQL** service to your project
+5. Configure environment variables in Railway dashboard
+6. Railway will auto-deploy on git push
+
+### Environment Variables
+
+Add the same variables as Vercel deployment:
+- `DATABASE_URL` (automatically provided by Railway PostgreSQL)
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+
+### Custom Domain
+
+1. Go to **Settings** → **Domains**
+2. Add your custom domain
+3. Update DNS records as instructed
+4. Update `NEXTAUTH_URL` and Google OAuth settings
+
+---
+
+## Docker Deployment
+
+For self-hosted or cloud VM deployment.
+
+### Create Dockerfile
 
 ```dockerfile
-FROM node:18-alpine AS base
-
-# Install dependencies only when needed
-FROM base AS deps
+FROM node:18-alpine AS deps
 WORKDIR /app
-
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm ci
 
-# Rebuild the source code only when needed
-FROM base AS builder
+FROM node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Generate Prisma Client
+ENV NEXT_TELEMETRY_DISABLED 1
 RUN npx prisma generate
-
-# Build Next.js
 RUN npm run build
 
-# Production image
-FROM base AS runner
+FROM node:18-alpine AS runner
 WORKDIR /app
-
-ENV NODE_ENV=production
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/prisma ./prisma
 
 USER nextjs
 
 EXPOSE 3000
-
-ENV PORT=3000
+ENV PORT 3000
 
 CMD ["node", "server.js"]
 ```
 
-Update `next.config.mjs`:
+### Create docker-compose.yml
 
-```javascript
-const nextConfig = {
-  output: 'standalone',
-  images: {
-    domains: ['lh3.googleusercontent.com'],
-  },
-};
+```yaml
+version: '3.8'
 
-export default nextConfig;
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/mygoogledashboard
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mygoogledashboard
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
 ```
 
-Build and run:
+### Deploy with Docker
 
 ```bash
-# Build
-docker build -t mygoogledashboard .
+# Build and start services
+docker-compose up -d
 
-# Run
-docker run -p 3000:3000 \
-  -e DATABASE_URL="your-database-url" \
-  -e NEXTAUTH_SECRET="your-secret" \
-  -e NEXTAUTH_URL="http://localhost:3000" \
-  -e GOOGLE_CLIENT_ID="your-client-id" \
-  -e GOOGLE_CLIENT_SECRET="your-client-secret" \
-  mygoogledashboard
+# Run database migrations
+docker-compose exec app npx prisma db push
+
+# View logs
+docker-compose logs -f app
 ```
 
-## 🌐 Netlify
+---
 
-Netlify requires some additional configuration for Next.js.
+## Environment Variables
 
-1. Install Netlify CLI:
-   ```bash
-   npm install -g netlify-cli
-   ```
+### Production Best Practices
 
-2. Build and deploy:
-   ```bash
-   npm run build
-   netlify deploy --prod
-   ```
+1. **Never commit secrets** to version control
+2. **Use different secrets** for each environment
+3. **Rotate secrets regularly** (especially `NEXTAUTH_SECRET`)
+4. **Enable SSL** for database connections
+5. **Use environment-specific** Google OAuth credentials
 
-3. Set environment variables in Netlify dashboard
+### Required Variables
 
-Note: Netlify may have limitations with Next.js App Router features.
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string with SSL | `postgresql://user:pass@host:5432/db?sslmode=require` |
+| `NEXTAUTH_SECRET` | Random secret for session encryption | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | Full URL of your deployed app | `https://your-app.vercel.app` |
+| `GOOGLE_CLIENT_ID` | Google OAuth Client ID | `123456-abc.apps.googleusercontent.com` |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret | `GOCSPX-xxx` |
 
-## ☁️ AWS / DigitalOcean / Other VPS
+### Optional Variables
 
-### Using PM2
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `NODE_ENV` | Environment mode | `production` |
+| `PORT` | Server port | `3000` |
 
-1. Set up your server with Node.js 18+
+---
 
-2. Install PM2:
-   ```bash
-   npm install -g pm2
-   ```
+## Post-Deployment Steps
 
-3. Build the application:
-   ```bash
-   npm run build
-   ```
+### 1. Verify Application Health
 
-4. Create `ecosystem.config.js`:
-   ```javascript
-   module.exports = {
-     apps: [{
-       name: 'mygoogledashboard',
-       script: 'npm',
-       args: 'start',
-       env: {
-         NODE_ENV: 'production',
-         PORT: 3000
-       }
-     }]
-   };
-   ```
+```bash
+# Check health endpoint
+curl https://your-app.vercel.app/api/health
 
-5. Start with PM2:
-   ```bash
-   pm2 start ecosystem.config.js
-   pm2 save
-   pm2 startup
-   ```
-
-### Using Nginx as Reverse Proxy
-
-Create `/etc/nginx/sites-available/mygoogledashboard`:
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
+# Expected response:
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "version": "0.1.0",
+  "database": "connected"
 }
 ```
 
-Enable the site:
+### 2. Test Authentication Flow
+
+1. Navigate to your deployed URL
+2. Click **"Sign in with Google"**
+3. Complete OAuth flow
+4. Verify redirect to dashboard
+5. Check activity logging in database
+
+### 3. Monitor Logs
+
+**Vercel:**
+- Go to project dashboard
+- Click **"Deployments"** → Select deployment
+- View **"Functions"** logs
+
+**Railway:**
+- Click on your service
+- View **"Logs"** tab in real-time
+
+### 4. Set Up Custom Domain (Optional)
+
+**Vercel:**
+1. Go to **Settings** → **Domains**
+2. Add your domain
+3. Configure DNS records
+4. Update `NEXTAUTH_URL` environment variable
+5. Update Google OAuth redirect URIs
+
+**Railway:**
+1. Similar process in Railway dashboard
+2. Update environment variables
+3. Update OAuth settings
+
+### 5. Configure Analytics (Optional)
+
+Enable Vercel Analytics:
 ```bash
-sudo ln -s /etc/nginx/sites-available/mygoogledashboard /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+npm install @vercel/analytics
 ```
 
-## 🔒 Production Checklist
+Update `app/layout.tsx`:
+```typescript
+import { Analytics } from '@vercel/analytics/react';
 
-Before going live, ensure:
-
-- [ ] Environment variables are set correctly
-- [ ] Database schema is pushed to production
-- [ ] Google OAuth redirect URIs include production domain
-- [ ] NEXTAUTH_URL matches production domain
-- [ ] NEXTAUTH_SECRET is a strong, unique value
-- [ ] Database backups are configured
-- [ ] SSL/HTTPS is enabled
-- [ ] Error logging is set up
-- [ ] Performance monitoring is in place
-
-## 🔐 Environment Variables for Production
-
-```env
-# Database - Use production PostgreSQL URL
-DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
-
-# NextAuth - Generate new secret for production
-NEXTAUTH_SECRET="<generate-new-with-openssl-rand-base64-32>"
-NEXTAUTH_URL="https://your-production-domain.com"
-
-# Google OAuth - Same as development or create new credentials
-GOOGLE_CLIENT_ID="your-production-client-id"
-GOOGLE_CLIENT_SECRET="your-production-client-secret"
-
-# Optional: Logging and monitoring
-NODE_ENV="production"
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  );
+}
 ```
 
-## 📊 Monitoring
+---
 
-Consider adding:
-- **Error Tracking**: [Sentry](https://sentry.io)
-- **Analytics**: [Vercel Analytics](https://vercel.com/analytics) or [Google Analytics](https://analytics.google.com)
-- **Uptime Monitoring**: [UptimeRobot](https://uptimerobot.com)
-- **Performance**: [Vercel Speed Insights](https://vercel.com/docs/speed-insights)
-
-## 🆘 Troubleshooting Production Issues
-
-### Authentication Not Working
-
-- Verify NEXTAUTH_URL matches exactly (including https://)
-- Check Google OAuth redirect URIs
-- Ensure NEXTAUTH_SECRET is set and different from development
-
-### Database Connection Failed
-
-- Verify DATABASE_URL is correct
-- Check if database allows connections from your hosting provider's IPs
-- Ensure SSL mode is configured if required
-- Confirm Prisma schema is pushed to production database
+## Troubleshooting
 
 ### Build Failures
 
+**Error: Cannot find module 'prisma'**
 ```bash
-# Clear cache and rebuild
-rm -rf .next node_modules
-npm install
-npm run build
+# Ensure postinstall script runs
+# Add to package.json if missing:
+"postinstall": "prisma generate"
 ```
+
+**Error: Environment variable not found**
+- Verify all required environment variables are set in deployment platform
+- Check for typos in variable names
+- Ensure no trailing spaces in values
+
+### Database Connection Issues
+
+**SSL Required Error**
+```
+Add ?sslmode=require to DATABASE_URL
+postgresql://user:pass@host:5432/db?sslmode=require
+```
+
+**Connection Timeout**
+- Verify database is accessible from deployment platform
+- Check firewall rules
+- Ensure connection string is correct
+
+### OAuth Errors
+
+**Redirect URI Mismatch**
+1. Check Google Console redirect URIs exactly match
+2. Include both HTTP and HTTPS if testing
+3. Ensure no trailing slashes
+
+**Invalid Client Error**
+- Verify `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are correct
+- Check if OAuth consent screen is published
+- Ensure credentials are for the correct Google Cloud project
 
 ### Runtime Errors
 
-Check logs:
+**Check Vercel Function Logs:**
+1. Go to Vercel dashboard
+2. Select your project
+3. Click **"Deployments"** → Latest deployment
+4. View **"Functions"** tab for error logs
+
+**Check Railway Logs:**
 ```bash
-# Vercel
-vercel logs
-
-# PM2
-pm2 logs mygoogledashboard
-
-# Docker
-docker logs <container-id>
+railway logs
 ```
 
-## 🎯 Performance Optimization
+### Performance Issues
 
-1. **Enable Image Optimization**: Already configured in Next.js
-2. **Add Caching Headers**: Configure in your hosting platform
-3. **Enable Compression**: Gzip/Brotli (usually automatic)
-4. **Use CDN**: Vercel provides this automatically
-5. **Database Indexing**: Add indexes to frequently queried fields in Prisma
+**Slow Database Queries:**
+- Enable Prisma query logging
+- Add database indexes for frequently queried fields
+- Use database connection pooling (PgBouncer)
 
-## 🔄 Updating Production
+**High Function Execution Time:**
+- Enable Vercel Speed Insights
+- Optimize API routes
+- Use static generation where possible
 
-### Vercel (Automatic)
-- Push to your main branch
-- Vercel automatically deploys
+---
 
-### Manual Deployment
-```bash
-git pull origin main
-npm install
-npm run build
-npx prisma db push  # If schema changed
-pm2 restart mygoogledashboard
-```
+## Security Checklist
 
-## 📚 Additional Resources
+Before going to production:
 
-- [Next.js Deployment Documentation](https://nextjs.org/docs/deployment)
+- [ ] Use production-grade `NEXTAUTH_SECRET`
+- [ ] Enable SSL for database connections
+- [ ] Set up proper CORS policies
+- [ ] Configure security headers (already in `next.config.mjs`)
+- [ ] Enable HTTPS only
+- [ ] Set up monitoring and alerts
+- [ ] Configure rate limiting for API routes
+- [ ] Review and minimize environment variable exposure
+- [ ] Set up backup strategy for database
+- [ ] Enable audit logging
+- [ ] Configure Content Security Policy
+- [ ] Test OAuth flow in production
+- [ ] Verify error pages don't leak sensitive info
+
+---
+
+## Monitoring and Maintenance
+
+### Recommended Tools
+
+1. **Vercel Analytics** - Built-in performance monitoring
+2. **Sentry** - Error tracking and monitoring
+3. **Datadog** - Infrastructure monitoring
+4. **PostgreSQL** - Database query monitoring via provider dashboard
+
+### Regular Maintenance
+
+- Monitor database size and performance
+- Review application logs weekly
+- Update dependencies monthly
+- Rotate secrets quarterly
+- Review OAuth permissions
+- Check for security vulnerabilities: `npm audit`
+
+---
+
+## Cost Estimation
+
+### Vercel (Hobby Plan)
+
+- **Free tier includes:**
+  - 100GB bandwidth/month
+  - Unlimited deployments
+  - Automatic SSL
+  - Built-in CDN
+
+### Database Hosting
+
+- **Supabase**: Free tier (500MB, 2 CPU hours/day)
+- **Railway**: $5/month (500MB RAM, 1GB storage)
+- **Neon**: Free tier (3GB storage)
+
+### Estimated Monthly Cost
+
+**Development/POC**: $0 (using free tiers)
+**Production**: $5-20/month depending on usage
+
+---
+
+## Support and Resources
+
 - [Vercel Documentation](https://vercel.com/docs)
-- [Prisma Deployment Guide](https://www.prisma.io/docs/guides/deployment)
+- [Next.js Deployment](https://nextjs.org/docs/deployment)
+- [Prisma Deployment](https://www.prisma.io/docs/guides/deployment)
 - [NextAuth.js Deployment](https://next-auth.js.org/deployment)
 
 ---
 
-**Need help?** Check the main README.md troubleshooting section or open an issue.
+**Ready to deploy!** Follow the steps above and your My Google Dashboard will be live in production. 🚀

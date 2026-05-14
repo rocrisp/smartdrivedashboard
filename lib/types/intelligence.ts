@@ -49,7 +49,7 @@ export interface ProjectsData {
   lastComputed: string;
 
   /** Schema version for migrations */
-  schemaVersion: number;
+  schemaVersion: string;
 }
 
 // ============================================================================
@@ -74,6 +74,9 @@ export interface FilenameSuggestion {
 
   /** Whether user accepted this suggestion */
   accepted: boolean;
+
+  /** User-provided custom nickname (if accepted or manually set) */
+  personalNickname?: string;
 }
 
 export interface SuggestionsData {
@@ -84,7 +87,7 @@ export interface SuggestionsData {
   lastComputed: string;
 
   /** Schema version for migrations */
-  schemaVersion: number;
+  schemaVersion: string;
 }
 
 // ============================================================================
@@ -133,7 +136,7 @@ export interface SessionsData {
   lastComputed: string;
 
   /** Schema version for migrations */
-  schemaVersion: number;
+  schemaVersion: string;
 }
 
 // ============================================================================
@@ -169,7 +172,7 @@ export interface LabelsData {
   lastComputed: string;
 
   /** Schema version for migrations */
-  schemaVersion: number;
+  schemaVersion: string;
 }
 
 // ============================================================================
@@ -218,7 +221,7 @@ export interface CollectionsData {
   lastComputed: string;
 
   /** Schema version for migrations */
-  schemaVersion: number;
+  schemaVersion: string;
 }
 
 // ============================================================================

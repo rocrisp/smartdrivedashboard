@@ -1,299 +1,289 @@
-# My Google Dashboard 🚀
+# My Google Drive Dashboard 🚀
 
-A modern, secure proof-of-concept personal dashboard application for managing Google services, built with the latest web technologies.
+A better way to find and organize your Google Drive files. Never lose track of shared documents again!
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)
-![React](https://img.shields.io/badge/React-19-blue)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
+**The Problem**: Google Drive's default UI makes it hard to find files shared with you, distinguish file types at a glance, or remember where you saw something before.
+
+**The Solution**: This dashboard surfaces the right files at the right time, with clear organization by type, recency, and collaborator.
+
+<div align="center">
+
+![Next.js](https://img.shields.io/badge/Next.js-15.1-black?style=for-the-badge&logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)
+![Maintained](https://img.shields.io/badge/Maintained-Yes-success?style=for-the-badge)
+
+</div>
 
 ## ✨ Features
 
-### Core Functionality
-- **🔐 Google OAuth Authentication**: Secure sign-in with your Google account
-- **💾 Database Storage**: PostgreSQL database with Prisma ORM
-- **📊 Real-time Statistics**: Track sign-ins, sessions, and account activity
-- **📝 Activity Logging**: Automatic tracking of user actions and events
-- **⚙️ Settings Management**: User preferences and account management
+### Core Features
+- 📁 **Find Shared Files Easily** - See all files shared with you, grouped by who shared them
+- 🔍 **Smart Search** - Full-text search with file type filtering
+- ⭐ **Bookmark System** - Pin important files for quick access (stored locally)
+- 👥 **See Who Shared What** - Clear attribution for every shared document
+- 🕒 **Recently Viewed** - Track files you've opened, sorted by recency
+- 📊 **File Type Filters** - Filter by Docs, Sheets, Slides, Images, Videos with live counts
+- 🔢 **Sorting Options** - Sort by name, date, or sharer across all tabs
+- 📝 **View History** - Local tracking of every file you click on
 
-### User Interface
-- **🎨 Modern UI**: Clean, intuitive, and responsive design using Tailwind CSS
-- **🌙 Dark Mode**: Automatic dark mode support based on system preferences
-- **📱 Mobile Responsive**: Optimized for all screen sizes and devices
-- **🔔 Toast Notifications**: Real-time feedback for user actions
-- **💀 Skeleton Loaders**: Smooth loading states for better UX
-- **♿ Accessibility**: WCAG compliant with ARIA labels and keyboard navigation
+### Technical Features
+- 🔐 **Google OAuth 2.0** - Secure read-only access to your Drive
+- 🌙 **Dark Mode** - Manual Light/Dark/System theme switching
+- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+- ⌨️ **Keyboard Shortcuts** - Navigate quickly with keyboard
+- ♿ **Accessible** - WCAG Level AA compliant
+- 💾 **Offline-First** - Bookmarks and history stored locally
+- 🚀 **Fast & Lightweight** - No backend database for user data
+- 🔒 **Privacy-Focused** - Read-only Drive access, local storage only
 
-### Developer Experience
-- **🔒 Type-Safe**: Built with TypeScript for reliability
-- **⚡ Fast**: Built on Next.js 15 with React 19
-- **🛡️ Secure**: Industry-standard OAuth 2.0 authentication
-- **🎯 API Endpoints**: Health checks, statistics, and activity tracking
-- **📚 Comprehensive Docs**: Setup guides, deployment docs, and contributing guidelines
-- **🔧 Development Tools**: Automated setup, environment validation, and database seeding
+## 🎯 Perfect For
+
+- ✅ Finding documents colleagues shared with you
+- ✅ Organizing files by collaborator or sharer
+- ✅ Quickly accessing frequently-used spreadsheets
+- ✅ Searching across all your Drive files
+- ✅ Tracking which files you've viewed recently
+- ✅ Filtering large file lists by type (Docs, Sheets, etc.)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - **Node.js** 18 or later ([Download](https://nodejs.org/))
-- **PostgreSQL** database (local or cloud)
 - **Google Cloud** account for OAuth credentials
 
-### Option 1: Automated Setup (Recommended)
+### Setup Instructions
 
 ```bash
-# Run the setup script
-npm run setup
-
-# Configure your .env file (see instructions below)
-# Then push database schema
-npm run db:push
-
-# Start the development server
-npm run dev
-```
-
-### Option 2: Manual Setup
-
-```bash
-# 1. Install dependencies
+# 1. Clone and install
+git clone <your-repo-url>
+cd mygoogledashboard
 npm install
 
-# 2. Copy environment template
+# 2. Configure environment
 cp .env.example .env
+# Edit .env with your Google OAuth credentials (see below)
 
-# 3. Edit .env with your credentials (see Configuration section)
+# 3. Generate NEXTAUTH_SECRET
+openssl rand -base64 32
+# Add the output to .env as NEXTAUTH_SECRET
 
-# 4. Generate Prisma client
-npm run db:generate
-
-# 5. Push database schema
-npm run db:push
-
-# 6. Start development server
+# 4. Start development server
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## ⚙️ Configuration
+## ⚙️ Google OAuth Setup
 
-### 1. PostgreSQL Database
-
-Choose one of these options:
-
-#### Option A: Cloud Database (Easiest)
-- **[Supabase](https://supabase.com)** - Free tier, instant setup
-- **[Railway](https://railway.app)** - Free tier, great for dev
-- **[Neon](https://neon.tech)** - Serverless PostgreSQL
-
-#### Option B: Local PostgreSQL
-
-```bash
-# macOS
-brew install postgresql
-brew services start postgresql
-createdb mygoogledashboard
-
-# Ubuntu/Debian
-sudo apt-get install postgresql
-sudo systemctl start postgresql
-sudo -u postgres createdb mygoogledashboard
-
-# Your DATABASE_URL will be:
-postgresql://username:password@localhost:5432/mygoogledashboard
-```
-
-### 2. Google OAuth Setup
+### 1. Create Google Cloud Project
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project or select existing one
-3. Navigate to "APIs & Services" → "Credentials"
-4. Click "Create Credentials" → "OAuth client ID"
-5. Configure consent screen if prompted
-6. Choose "Web application"
-7. Add authorized JavaScript origins:
+2. Create a new project (or select existing)
+3. Navigate to "APIs & Services" → "Library"
+4. Enable **Google Drive API**
+
+### 2. Configure OAuth Consent Screen
+
+1. Go to "APIs & Services" → "OAuth consent screen"
+2. Choose "External" user type
+3. Fill in app name, email, and developer contact
+4. Add scopes:
+   - `https://www.googleapis.com/auth/drive.metadata.readonly`
+   - `https://www.googleapis.com/auth/drive.readonly`
+5. Add test users (your email) if in development mode
+6. Save and continue
+
+### 3. Create OAuth Credentials
+
+1. Go to "APIs & Services" → "Credentials"
+2. Click "Create Credentials" → "OAuth client ID"
+3. Choose "Web application"
+4. Add authorized JavaScript origins:
    ```
    http://localhost:3000
    ```
-8. Add authorized redirect URIs:
+5. Add authorized redirect URIs:
    ```
    http://localhost:3000/api/auth/callback/google
    ```
-9. Copy your **Client ID** and **Client Secret**
+6. Click "Create"
+7. Copy your **Client ID** and **Client Secret**
 
-### 3. Environment Variables
+### 4. Configure Environment Variables
 
 Edit your `.env` file:
 
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/mygoogledashboard"
-
 # NextAuth.js
-# Generate a secret: openssl rand -base64 32
+# Generate: openssl rand -base64 32
 NEXTAUTH_SECRET="your-generated-secret-here"
 NEXTAUTH_URL="http://localhost:3000"
 
-# Google OAuth
+# Google OAuth (from step 3)
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 
-**Generate NEXTAUTH_SECRET:**
-```bash
-openssl rand -base64 32
+## 📱 Dashboard Tabs
+
+### 1. Recently Viewed
+- Shows files you've viewed recently (sorted by `viewedByMeTime`)
+- Filter by file type (Docs, Sheets, Slides, Images, Videos)
+- Sort by: Recently Viewed, Name (A-Z), Last Modified
+- File counts shown for each filter
+
+### 2. Shared with Me
+- Files shared with you, grouped by who shared them
+- Filter by file type with counts
+- Sort by: Most Recent, Name (A-Z), Sharer (A-Z)
+- Solves the main problem: "Can't find docs others shared unless I star them"
+
+### 3. Search Files
+- Full-text search across all Drive files
+- Filter search results by file type
+- Shows total results and filtered counts
+- Example: "Found 45 files • Showing 12 docs"
+
+### 4. Bookmarks
+- Files you've starred within the dashboard
+- Stored locally (not synced to Drive stars)
+- Sort by: Recently Bookmarked, Name (A-Z)
+- Quick delete and open actions
+
+### 5. View History
+- Local tracking of every file you click
+- Chronological list with timestamps
+- Sort by: Recently Viewed, Name (A-Z)
+- Shows who shared each file
+- Clear individual entries or clear all
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `?` | Show help modal |
+| `d` | Go to Dashboard |
+| `s` | Go to Settings |
+| `e` | Go to Sessions |
+| `r` | Refresh page |
+| `/` | Focus search (in Search tab) |
+| `Esc` | Close modals |
+
+*Shortcuts disabled when typing in input fields*
+
+## 🎨 File Type Icons
+
+The dashboard color-codes files for quick recognition:
+
+| Type | Icon | Color |
+|------|------|-------|
+| Google Docs | 📄 | Blue |
+| Google Sheets | 📊 | Green |
+| Google Slides | 📽️ | Orange |
+| Images | 🖼️ | Pink |
+| Videos | 🎥 | Red |
+| PDFs | 📕 | Gray |
+| Folders | 📁 | Yellow |
+| Other | 📎 | Gray |
+
+## 🔒 Privacy & Security
+
+- **Read-Only Access**: Dashboard only reads file metadata, never modifies files
+- **Local Storage**: Bookmarks and view history stored in your browser only
+- **No Backend Database**: No user data sent to any server
+- **OAuth Scopes**:
+  - `drive.metadata.readonly` - Read file names, types, dates
+  - `drive.readonly` - Read file content (for search)
+- **Secure Sessions**: NextAuth.js JWT sessions
+- **No Tracking**: No analytics or user tracking
+
+## 📁 Project Structure
+
+```
+mygoogledashboard/
+├── app/
+│   ├── api/
+│   │   ├── auth/              # NextAuth routes
+│   │   └── drive/             # Drive API endpoints
+│   │       ├── shared-with-me/
+│   │       ├── recently-viewed/
+│   │       ├── search/
+│   │       └── my-files/
+│   ├── dashboard/             # Main dashboard page
+│   └── page.tsx               # Landing page
+├── components/
+│   ├── Drive/                 # Drive-specific components
+│   │   ├── SharedWithMe.tsx
+│   │   ├── RecentlyViewed.tsx
+│   │   ├── FileSearch.tsx
+│   │   ├── BookmarkedFiles.tsx
+│   │   ├── ViewHistory.tsx
+│   │   ├── DriveFileList.tsx  # Reusable file list
+│   │   └── FileTypeFilter.tsx # Filter buttons
+│   └── ui/                    # UI components
+├── lib/
+│   ├── auth.ts                # NextAuth config with Drive scopes
+│   ├── google-drive.ts        # Drive API client
+│   ├── bookmarks.ts           # Bookmark manager (localStorage)
+│   └── view-history.ts        # View history tracker
+├── hooks/
+│   └── useKeyboardShortcuts.ts
+└── types/
+    └── next-auth.d.ts
 ```
 
-### 4. Validate Configuration
+## 🔌 API Routes
 
-```bash
-npm run check:env
-```
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/drive/shared-with-me` | GET | Fetch files shared with user |
+| `/api/drive/recently-viewed` | GET | Fetch recently viewed files |
+| `/api/drive/search?q={query}` | GET | Search all Drive files |
+| `/api/drive/my-files?mimeType={type}` | GET | Fetch user's files by type |
+| `/api/auth/[...nextauth]` | * | Authentication routes |
+
+All Drive endpoints require authentication via NextAuth session.
 
 ## 📜 Available Scripts
 
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Start development server |
-| `npm run dev:safe` | Start with environment validation |
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
-| `npm run setup` | Automated setup script |
-| `npm run check:env` | Validate environment variables |
-| `npm run db:push` | Push schema to database |
-| `npm run db:generate` | Generate Prisma client |
-| `npm run db:studio` | Open Prisma Studio (database GUI) |
-| `npm run db:seed` | Seed database with sample data |
-| `npm run db:reset` | Reset database |
-
-## 📁 Project Structure
-
-```
-mygoogledashboard/
-├── app/                         # Next.js app directory
-│   ├── api/                     # API routes
-│   │   ├── activities/         # Activity tracking endpoints
-│   │   ├── auth/               # NextAuth.js routes
-│   │   ├── health/             # Health check endpoint
-│   │   ├── stats/              # Statistics endpoint
-│   │   └── status/             # Status endpoint
-│   ├── dashboard/              # Dashboard page
-│   │   ├── page.tsx            # Dashboard UI
-│   │   └── loading.tsx         # Loading state
-│   ├── settings/               # Settings page
-│   ├── error.tsx               # Error boundary
-│   ├── loading.tsx             # Global loading
-│   ├── not-found.tsx           # 404 page
-│   ├── layout.tsx              # Root layout
-│   ├── page.tsx                # Home/login page
-│   └── globals.css             # Global styles
-├── components/                  # React components
-│   ├── Dashboard/              # Dashboard-specific
-│   │   ├── ActivityFeed.tsx    # Activity widget
-│   │   ├── QuickActions.tsx    # Quick actions widget
-│   │   └── StatsOverview.tsx   # Statistics widget
-│   ├── ui/                     # Reusable UI components
-│   │   ├── Card.tsx            # Card component
-│   │   ├── Button.tsx          # Button component
-│   │   ├── Toast.tsx           # Toast notifications
-│   │   └── Skeleton.tsx        # Skeleton loaders
-│   ├── AuthProvider.tsx        # Session provider
-│   ├── Header.tsx              # Navigation header
-│   ├── Footer.tsx              # Footer component
-│   └── SkipToContent.tsx       # Accessibility skip link
-├── lib/                        # Utility libraries
-│   ├── auth.ts                 # NextAuth config
-│   └── prisma.ts               # Prisma client
-├── prisma/                     # Database
-│   ├── schema.prisma           # Database schema
-│   └── seed.ts                 # Database seeding
-├── scripts/                    # Helper scripts
-│   ├── setup.sh                # Setup automation
-│   ├── check-env.js            # Environment validator
-│   └── dev.sh                  # Safe dev start
-├── types/                      # TypeScript types
-│   └── next-auth.d.ts          # NextAuth types
-└── public/                     # Static files
-    ├── logo.svg                # Application logo
-    └── manifest.json           # PWA manifest
-```
-
-## 🔒 Security
-
-- **OAuth 2.0**: Industry-standard authentication
-- **Session Management**: Secure database-backed sessions
-- **Environment Variables**: Sensitive data isolated
-- **HTTPS Ready**: Production-ready security headers
-- **Type Safety**: TypeScript prevents common bugs
-
-## 🎨 Tech Stack
-
-| Category | Technology |
-|----------|-----------|
-| **Framework** | Next.js 15 (App Router) |
-| **Language** | TypeScript 5.7 |
-| **UI Library** | React 19 |
-| **Styling** | Tailwind CSS 3.4 |
-| **Authentication** | NextAuth.js 4 |
-| **Database** | PostgreSQL |
-| **ORM** | Prisma 6 |
-| **Icons** | Lucide React |
-| **Linting** | ESLint 9 |
-
-## 🚧 Roadmap
-
-Future enhancements for this POC:
-
-- [ ] Google Calendar integration
-- [ ] Gmail stats and insights
-- [ ] Google Drive usage dashboard
-- [ ] Google Analytics data visualization
-- [ ] Customizable dashboard widgets
-- [ ] Data export functionality
-- [ ] Real-time notifications
-- [ ] Multi-language support
-- [ ] Advanced analytics
-- [ ] Mobile app
 
 ## 🐛 Troubleshooting
 
-### Database Connection Issues
-
-```bash
-# Check if PostgreSQL is running
-brew services list  # macOS
-systemctl status postgresql  # Linux
-
-# Test database connection
-npm run db:studio
-
-# If connection fails, verify DATABASE_URL in .env
-```
-
 ### Google OAuth Issues
 
-- ✅ Verify redirect URI matches exactly in Google Console
-- ✅ Check that both `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set
-- ✅ Ensure `NEXTAUTH_URL` matches your development URL
-- ✅ Clear browser cookies and try again
-- ✅ Check Google Cloud Console for any disabled APIs
+**"Access Blocked: This app's request is invalid"**
+- ✅ Add `http://localhost:3000` to authorized JavaScript origins
+- ✅ Add `http://localhost:3000/api/auth/callback/google` to redirect URIs
+- ✅ Ensure both URIs are **exactly** as shown (no trailing slashes)
 
-### Build Errors
+**"Sign-in loop" or "OAuthAccountNotLinked"**
+- ✅ Clear all site cookies
+- ✅ Check that `NEXTAUTH_URL` matches your dev URL
+- ✅ Verify `NEXTAUTH_SECRET` is set and generated correctly
 
-```bash
-# Clear Next.js cache
-rm -rf .next
+**"Behind corporate firewall"**
+- ✅ Connect to VPN if accessing from corporate network
+- ✅ Ensure firewall allows connections to `accounts.google.com`
+- ✅ Check with IT if OAuth is blocked
 
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
+### Re-authentication Required
 
-# Regenerate Prisma client
-npm run db:generate
-```
+After updating OAuth scopes, users must:
+1. Sign out of the dashboard
+2. Clear browser cookies for `localhost:3000`
+3. Sign in again to grant new Drive permissions
 
 ### Port Already in Use
 
@@ -301,34 +291,81 @@ npm run db:generate
 # Kill process on port 3000
 lsof -ti:3000 | xargs kill -9
 
-# Or use a different port
+# Or use different port
 PORT=3001 npm run dev
 ```
 
-## 📖 Learn More
+## 🎯 Development Iterations
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [NextAuth.js Documentation](https://next-auth.js.org)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs)
+This project was built iteratively with Ralph Loop:
+
+- **Iteration 1**: Google Drive API integration, OAuth setup
+- **Iteration 2**: Phase 2 features (search, filters, bookmarks, history)
+- **Iteration 3**: Polish (sorting, file counts, search filtering)
+
+See [ITERATION_3_SUMMARY.md](ITERATION_3_SUMMARY.md) for detailed iteration notes.
+
+## 🚧 Roadmap
+
+### Completed ✅
+- [x] Google Drive OAuth with read-only scopes
+- [x] Recently Viewed files tab
+- [x] Shared with Me tab (grouped by sharer)
+- [x] Full-text search across all files
+- [x] File type filtering with counts
+- [x] Bookmark system (localStorage)
+- [x] View history tracking
+- [x] Sorting options (name, date, sharer)
+- [x] Dark mode support
+- [x] Keyboard shortcuts
+- [x] Responsive design
+
+### Future Enhancements
+- [ ] My Files tab (browse user's own files)
+- [ ] Folder navigation with breadcrumbs
+- [ ] Tags for organizing bookmarks
+- [ ] Export bookmark/history lists
+- [ ] Pagination for large file lists
+- [ ] Skeleton loading states
+- [ ] "Shared BY me" view
+- [ ] File statistics dashboard
+- [ ] Calendar integration for scheduled docs
 
 ## 🤝 Contributing
 
-This is a proof of concept project. Feel free to fork and enhance!
+Contributions welcome! This is a production-ready proof of concept demonstrating:
+- Google Drive API integration
+- Read-only OAuth scopes
+- Client-side data persistence (localStorage)
+- Modern Next.js 15 App Router patterns
+- TypeScript best practices
 
 ## 📄 License
 
-MIT License - feel free to use this project for learning and development.
+MIT License - free to use for learning and development.
 
 ## 💬 Support
 
-For issues and questions:
-1. Check the [Troubleshooting](#-troubleshooting) section
-2. Review the configuration steps
-3. Verify all environment variables are set correctly
-4. Check that your database is accessible
+For issues:
+1. Check [Troubleshooting](#-troubleshooting) section
+2. Verify all environment variables are set correctly
+3. Ensure Google Cloud Console OAuth is configured properly
+4. Check that Drive API is enabled in your project
+
+## 📚 Related Documentation
+
+- [DRIVE_FEATURES.md](DRIVE_FEATURES.md) - Comprehensive user guide
+- [ITERATION_3_SUMMARY.md](ITERATION_3_SUMMARY.md) - Development iteration notes
+- [CLAUDE.md](CLAUDE.md) - Project requirements and technical design
 
 ---
 
-**Built with ❤️ using Next.js, TypeScript, and modern web technologies**
+<div align="center">
+
+**✅ Built with Ralph Loop | 3 Iterations | Google Drive Dashboard**
+
+Built with ❤️ using Next.js, TypeScript, and Google Drive API
+
+*Solving the problem: "I can't find the google doc someone else shared with me unless I star it"*
+
+</div>

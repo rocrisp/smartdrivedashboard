@@ -2,8 +2,9 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { LogOut, Settings as SettingsIcon, LayoutDashboard } from "lucide-react";
+import { LogOut, Settings as SettingsIcon, LayoutDashboard, Shield } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const { data: session } = useSession();
@@ -67,6 +68,18 @@ export function Header() {
                 <SettingsIcon className="w-4 h-4" aria-hidden="true" />
                 Settings
               </Link>
+              <Link
+                href="/sessions"
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  pathname === "/sessions"
+                    ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                aria-current={pathname === "/sessions" ? "page" : undefined}
+              >
+                <Shield className="w-4 h-4" aria-hidden="true" />
+                Sessions
+              </Link>
             </nav>
           </div>
 
@@ -80,6 +93,9 @@ export function Header() {
             >
               <SettingsIcon className="w-5 h-5" />
             </Link>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             <button
               onClick={() => signOut({ callbackUrl: "/" })}

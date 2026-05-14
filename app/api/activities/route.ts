@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getRateLimitHeaders } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,21 @@ export async function GET(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateLimitResult = rateLimit(session.user.id, "authenticated");
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        {
+          error: "Too many requests. Please try again later.",
+          retryAfter: new Date(rateLimitResult.resetTime).toISOString(),
+        },
+        {
+          status: 429,
+          headers: getRateLimitHeaders(rateLimitResult),
+        }
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -27,7 +43,10 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
 
-    return NextResponse.json({ activities });
+    return NextResponse.json(
+      { activities },
+      { headers: getRateLimitHeaders(rateLimitResult) }
+    );
   } catch (error) {
     console.error("Error fetching activities:", error);
     return NextResponse.json(
@@ -44,6 +63,21 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateLimitResult = rateLimit(session.user.id, "authenticated");
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        {
+          error: "Too many requests. Please try again later.",
+          retryAfter: new Date(rateLimitResult.resetTime).toISOString(),
+        },
+        {
+          status: 429,
+          headers: getRateLimitHeaders(rateLimitResult),
+        }
+      );
     }
 
     const body = await request.json();
@@ -65,7 +99,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ activity });
+    return NextResponse.json(
+      { activity },
+      { headers: getRateLimitHeaders(rateLimitResult) }
+    );
   } catch (error) {
     console.error("Error creating activity:", error);
     return NextResponse.json(
