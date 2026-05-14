@@ -22,17 +22,21 @@ interface CardHeaderProps {
   icon: ReactNode;
   title: string;
   iconBgColor?: string;
+  children?: ReactNode;
 }
 
-export function CardHeader({ icon, title, iconBgColor = "bg-blue-100 dark:bg-blue-900" }: CardHeaderProps) {
+export function CardHeader({ icon, title, iconBgColor = "bg-blue-100 dark:bg-blue-900", children }: CardHeaderProps) {
   return (
-    <div className="flex items-center gap-3 mb-4">
-      <div className={`p-2 ${iconBgColor} rounded-lg`}>
-        {icon}
+    <div className="flex items-center justify-between gap-3 mb-4">
+      <div className="flex items-center gap-3">
+        <div className={`p-2 ${iconBgColor} rounded-lg`}>
+          {icon}
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          {title}
+        </h3>
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-        {title}
-      </h3>
+      {children}
     </div>
   );
 }

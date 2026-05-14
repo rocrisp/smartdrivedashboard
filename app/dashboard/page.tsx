@@ -8,7 +8,6 @@ import { RecentlyViewed } from "@/components/Drive/RecentlyViewed";
 import { FileSearch } from "@/components/Drive/FileSearch";
 import { BookmarkedFiles } from "@/components/Drive/BookmarkedFiles";
 import { ViewHistory } from "@/components/Drive/ViewHistory";
-import { UserProfileCard } from "@/components/Dashboard/UserProfileCard";
 import { FloatingHelpButton } from "@/components/FloatingHelpButton";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { Header } from "@/components/Header";
@@ -96,11 +95,6 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
-        {/* User Profile */}
-        <div className="mb-6">
-          <UserProfileCard />
-        </div>
-
         {/* Tabs */}
         <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex space-x-1 overflow-x-auto">
