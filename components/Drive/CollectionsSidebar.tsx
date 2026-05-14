@@ -5,21 +5,29 @@ import { CollectionsManager } from "@/lib/collections";
 import { SmartCollection, CollectionProfile } from "@/lib/types/intelligence";
 import { DriveFile } from "@/lib/google-drive";
 import { Plus, FolderOpen, Trash2, Edit2, ChevronRight, ChevronDown } from "lucide-react";
+import { FloatingWindow } from "@/components/ui/FloatingWindow";
 
 interface CollectionsSidebarProps {
   allFiles: DriveFile[];
   onFileRemove?: () => void;
+  isVisible: boolean;
+  onClose: () => void;
 }
 
-export function CollectionsSidebar({ allFiles, onFileRemove }: CollectionsSidebarProps) {
+export function CollectionsSidebar({ allFiles, onFileRemove, isVisible, onClose }: CollectionsSidebarProps) {
   const [collections, setCollections] = useState<SmartCollection[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCollection, setEditingCollection] = useState<SmartCollection | null>(null);
   const [selectedCollection, setSelectedCollection] = useState<SmartCollection | null>(null);
   const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set());
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [defaultPosition, setDefaultPosition] = useState({ x: 100, y: 100 });
 
   useEffect(() => {
     loadCollections();
+    if (typeof window !== 'undefined') {
+      setDefaultPosition({ x: window.innerWidth - 450, y: 100 });
+    }
   }, []);
 
   const loadCollections = () => {
@@ -86,31 +94,38 @@ export function CollectionsSidebar({ allFiles, onFileRemove }: CollectionsSideba
     gray: "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600",
   };
 
+  if (!isVisible) return null;
+
   return (
     <>
-      <div className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col h-full overflow-hidden">
-        {/* Header */}
+      <FloatingWindow
+        title="Virtual Buckets"
+        icon={<FolderOpen className="w-5 h-5" />}
+        defaultPosition={defaultPosition}
+        defaultSize={{ width: 380, height: 600 }}
+        onClose={onClose}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      >
+        {/* Header Actions */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <FolderOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">Virtual Buckets</h3>
-            </div>
+            <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+              Drag files here to organize
+            </p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="p-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors"
               title="New Bucket"
             >
               <Plus className="w-4 h-4" />
+              New
             </button>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Drag files here to organize
-          </p>
         </div>
 
         {/* Collections List */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+        <div className="p-3 space-y-2">
           {collections.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <FolderOpen className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -212,7 +227,7 @@ export function CollectionsSidebar({ allFiles, onFileRemove }: CollectionsSideba
             })
           )}
         </div>
-      </div>
+      </FloatingWindow>
 
       {/* Create/Edit Modal */}
       {showCreateModal && (
