@@ -14,7 +14,7 @@ describe('PatternAnalyzer', () => {
 
     it('should handle complex filename with quarters and dates', () => {
       const keywords = PatternAnalyzer.extractKeywords('Q4-2024-Sales-Report.pdf');
-      expect(keywords).toEqual(['q4', 'sales', 'report']);
+      expect(keywords).toEqual(['sales', 'report']);
     });
 
     it('should handle camelCase', () => {
@@ -33,8 +33,8 @@ describe('PatternAnalyzer', () => {
     });
 
     it('should filter short pure-letter keywords', () => {
-      const keywords = PatternAnalyzer.extractKeywords('Q4 Budget at SF office.doc');
-      expect(keywords).toEqual(['q4', 'budget', 'office']);
+      const keywords = PatternAnalyzer.extractKeywords('Q4 Budget at SF.doc');
+      expect(keywords).toEqual(['budget']);
     });
 
     it('should normalize to lowercase', () => {
@@ -45,6 +45,11 @@ describe('PatternAnalyzer', () => {
     it('should remove stopwords like "copy", "the", "of"', () => {
       const keywords = PatternAnalyzer.extractKeywords('Copy of the Sales Report.doc');
       expect(keywords).toEqual(['sales', 'report']);
+    });
+
+    it('should remove "draft" as a stopword', () => {
+      const keywords = PatternAnalyzer.extractKeywords('Copy of the final draft.doc');
+      expect(keywords).toEqual([]);
     });
 
     it('should handle empty filenames', () => {
@@ -74,10 +79,10 @@ describe('PatternAnalyzer', () => {
     });
 
     it('should calculate Jaccard similarity correctly', () => {
-      const keywords1 = ['q4', 'budget', 'report'];
-      const keywords2 = ['q4', 'budget', 'sheet'];
-      // Intersection: ['q4', 'budget'] = 2
-      // Union: ['q4', 'budget', 'report', 'sheet'] = 4
+      const keywords1 = ['budget', 'report', 'sales'];
+      const keywords2 = ['budget', 'sheet', 'sales'];
+      // Intersection: ['budget', 'sales'] = 2
+      // Union: ['budget', 'report', 'sales', 'sheet'] = 4
       // Jaccard: 2/4 = 0.5
       const similarity = PatternAnalyzer.calculateSimilarity(keywords1, keywords2);
       expect(similarity).toBeCloseTo(0.5);
@@ -149,6 +154,165 @@ describe('PatternAnalyzer', () => {
       const keywords = ['budget'];
       const name = PatternAnalyzer.generateNameFromKeywords(keywords);
       expect(name).toBe('Budget');
+    });
+  });
+
+  describe('detectFilenameProblems', () => {
+    it('should detect generic names', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('Untitled.doc');
+      expect(problems).toContain('generic');
+    });
+
+    it('should detect messy versioning', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('Report (1).pdf');
+      expect(problems).toContain('messy-versioning');
+    });
+
+    it('should detect too many numbers', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('20240315143052.xlsx');
+      expect(problems).toContain('too-many-numbers');
+    });
+
+    it('should detect all caps', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('DOCUMENT.PDF');
+      expect(problems).toContain('all-caps');
+    });
+
+    it('should detect all lowercase', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('mydocument.doc');
+      expect(problems).toContain('all-lowercase');
+    });
+
+    it('should detect no delimiters', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('mybudgetreport.doc');
+      expect(problems).toContain('no-delimiters');
+    });
+
+    it('should detect multiple problems', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('20240315143052.xlsx');
+      expect(problems.length).toBeGreaterThan(1);
+    });
+
+    it('should return empty array for good filenames', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('Q4 Budget Report.doc');
+      expect(problems).toEqual([]);
+    });
+
+    it('should handle empty filenames', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('');
+      expect(problems).toEqual([]);
+    });
+
+    it('should detect "Copy of" copies', () => {
+      const problems = PatternAnalyzer.detectFilenameProblems('Copy of Copy of doc.pdf');
+      expect(problems).toContain('generic');
+    });
+  });
+
+  describe('suggestBetterName', () => {
+    it('should suggest removing "Copy of" prefix', () => {
+      const suggestion = PatternAnalyzer.suggestBetterName('Copy of Budget.doc', ['budget']);
+      expect(suggestion).toBe('Budget.doc');
+    });
+
+    it('should suggest removing version indicators', () => {
+      const suggestion = PatternAnalyzer.suggestBetterName('Report (1).pdf', ['report']);
+      expect(suggestion).toBe('Report.pdf');
+    });
+
+    it('should suggest better name from generic date filename with keywords', () => {
+      const suggestion = PatternAnalyzer.suggestBetterName('Untitled 20240315.xlsx', ['budget', 'report']);
+      expect(suggestion).toBeTruthy();
+      expect(suggestion).toContain('Budget');
+    });
+
+    it('should return null when no improvement possible', () => {
+      const suggestion = PatternAnalyzer.suggestBetterName('Budget Report.doc', ['budget', 'report']);
+      expect(suggestion).toBeNull();
+    });
+
+    it('should return null for untitled with empty keywords', () => {
+      const suggestion = PatternAnalyzer.suggestBetterName('Untitled.doc', []);
+      expect(suggestion).toBeNull();
+    });
+
+    it('should preserve file extension', () => {
+      const suggestion = PatternAnalyzer.suggestBetterName('Copy of Report.xlsx', ['report']);
+      expect(suggestion).toContain('.xlsx');
+    });
+  });
+
+  describe('hasGenericName', () => {
+    it('should detect generic names', () => {
+      expect(PatternAnalyzer.hasGenericName('Untitled.doc')).toBe(true);
+      expect(PatternAnalyzer.hasGenericName('document.doc')).toBe(true);
+      expect(PatternAnalyzer.hasGenericName('file.pdf')).toBe(true);
+      expect(PatternAnalyzer.hasGenericName('new.xlsx')).toBe(true);
+      expect(PatternAnalyzer.hasGenericName('Copy of Something.doc')).toBe(true);
+    });
+
+    it('should not flag good filenames', () => {
+      expect(PatternAnalyzer.hasGenericName('Budget Report.doc')).toBe(false);
+      expect(PatternAnalyzer.hasGenericName('Q4 Sales.xlsx')).toBe(false);
+    });
+  });
+
+  describe('hasMessyVersioning', () => {
+    it('should detect version indicators', () => {
+      expect(PatternAnalyzer.hasMessyVersioning('Report (1).pdf')).toBe(true);
+      expect(PatternAnalyzer.hasMessyVersioning('Document [2].doc')).toBe(true);
+      expect(PatternAnalyzer.hasMessyVersioning('Copy 3 of file.xlsx')).toBe(true);
+    });
+
+    it('should not flag names without versions', () => {
+      expect(PatternAnalyzer.hasMessyVersioning('Budget Report.doc')).toBe(false);
+    });
+  });
+
+  describe('hasTooManyNumbers', () => {
+    it('should detect too many numbers', () => {
+      const result = PatternAnalyzer.hasTooManyNumbers('20240315143052.xlsx');
+      expect(result).toBe(true);
+    });
+
+    it('should allow normal use of numbers', () => {
+      expect(PatternAnalyzer.hasTooManyNumbers('Q4 2024 Report.doc')).toBe(false);
+    });
+  });
+
+  describe('isAllCapsOrLowercase', () => {
+    it('should detect all caps', () => {
+      expect(PatternAnalyzer.isAllCapsOrLowercase('DOCUMENT.PDF')).toBe('all-caps');
+    });
+
+    it('should detect all lowercase', () => {
+      expect(PatternAnalyzer.isAllCapsOrLowercase('mydocument.doc')).toBe('all-lowercase');
+    });
+
+    it('should not flag mixed case', () => {
+      expect(PatternAnalyzer.isAllCapsOrLowercase('Budget Report.doc')).toBe(null);
+    });
+  });
+
+  describe('lacksDelimiters', () => {
+    it('should detect lack of delimiters', () => {
+      expect(PatternAnalyzer.lacksDelimiters('mybudgetreport.doc')).toBe(true);
+    });
+
+    it('should allow camelCase', () => {
+      expect(PatternAnalyzer.lacksDelimiters('myBudgetReport.doc')).toBe(false);
+    });
+
+    it('should allow space delimiters', () => {
+      expect(PatternAnalyzer.lacksDelimiters('my budget report.doc')).toBe(false);
+    });
+
+    it('should allow underscore delimiters', () => {
+      expect(PatternAnalyzer.lacksDelimiters('my_budget_report.doc')).toBe(false);
+    });
+
+    it('should allow hyphen delimiters', () => {
+      expect(PatternAnalyzer.lacksDelimiters('my-budget-report.doc')).toBe(false);
     });
   });
 });
