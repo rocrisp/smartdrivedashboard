@@ -13,6 +13,8 @@ interface FloatingWindowProps {
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   className?: string;
+  onPositionChange?: (position: { x: number; y: number }) => void;
+  onSizeChange?: (size: { width: number; height: number }) => void;
 }
 
 export function FloatingWindow({
@@ -25,10 +27,10 @@ export function FloatingWindow({
   isCollapsed = false,
   onToggleCollapse,
   className = "",
+  onPositionChange,
+  onSizeChange,
 }: FloatingWindowProps) {
   const [mounted, setMounted] = useState(false);
-  const [position, setPosition] = useState(defaultPosition);
-  const [size, setSize] = useState(defaultSize);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -41,15 +43,21 @@ export function FloatingWindow({
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDragging) {
-        setPosition({
+        const newPosition = {
           x: e.clientX - dragOffset.x,
           y: e.clientY - dragOffset.y,
-        });
+        };
+        if (onPositionChange) {
+          onPositionChange(newPosition);
+        }
       }
       if (isResizing) {
-        const newWidth = Math.max(300, e.clientX - position.x);
-        const newHeight = Math.max(200, e.clientY - position.y);
-        setSize({ width: newWidth, height: newHeight });
+        const newWidth = Math.max(300, e.clientX - defaultPosition.x);
+        const newHeight = Math.max(200, e.clientY - defaultPosition.y);
+        const newSize = { width: newWidth, height: newHeight };
+        if (onSizeChange) {
+          onSizeChange(newSize);
+        }
       }
     };
 
@@ -66,7 +74,7 @@ export function FloatingWindow({
         document.removeEventListener("mouseup", handleMouseUp);
       };
     }
-  }, [isDragging, isResizing, dragOffset, position]);
+  }, [isDragging, isResizing, dragOffset, defaultPosition, onPositionChange, onSizeChange]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (windowRef.current) {
@@ -91,10 +99,10 @@ export function FloatingWindow({
       ref={windowRef}
       className={`fixed bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-2xl z-50 ${className}`}
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: isCollapsed ? "auto" : `${size.width}px`,
-        height: isCollapsed ? "auto" : `${size.height}px`,
+        left: `${defaultPosition.x}px`,
+        top: `${defaultPosition.y}px`,
+        width: isCollapsed ? "auto" : `${defaultSize.width}px`,
+        height: isCollapsed ? "auto" : `${defaultSize.height}px`,
       }}
     >
       {/* Title Bar */}
@@ -135,7 +143,7 @@ export function FloatingWindow({
       {/* Content */}
       {!isCollapsed && (
         <>
-          <div className="overflow-auto" style={{ height: `calc(${size.height}px - 56px)` }}>
+          <div className="overflow-auto" style={{ height: `calc(${defaultSize.height}px - 56px)` }}>
             {children}
           </div>
 

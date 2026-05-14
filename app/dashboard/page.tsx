@@ -33,6 +33,20 @@ export default function Dashboard() {
     bookmarks: false,
     history: false,
   });
+  const [windowPositions, setWindowPositions] = useState<Record<Tab, { x: number; y: number }>>({
+    recent: { x: 50, y: 150 },
+    shared: { x: 50, y: 150 },
+    search: { x: 50, y: 150 },
+    bookmarks: { x: 50, y: 150 },
+    history: { x: 50, y: 150 },
+  });
+  const [windowSizes, setWindowSizes] = useState<Record<Tab, { width: number; height: number }>>({
+    recent: { width: 800, height: 600 },
+    shared: { width: 800, height: 600 },
+    search: { width: 800, height: 600 },
+    bookmarks: { width: 800, height: 600 },
+    history: { width: 800, height: 600 },
+  });
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -122,6 +136,14 @@ export default function Dashboard() {
     setCollapsedWindows(prev => ({ ...prev, [tab]: !prev[tab] }));
   };
 
+  const handlePositionChange = (tab: Tab, position: { x: number; y: number }) => {
+    setWindowPositions(prev => ({ ...prev, [tab]: position }));
+  };
+
+  const handleSizeChange = (tab: Tab, size: { width: number; height: number }) => {
+    setWindowSizes(prev => ({ ...prev, [tab]: size }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <Header />
@@ -175,10 +197,12 @@ export default function Dashboard() {
           <FloatingWindow
             title="Recently Viewed"
             icon={<Clock className="w-5 h-5" />}
-            defaultPosition={{ x: 50, y: 150 }}
-            defaultSize={{ width: 800, height: 600 }}
+            defaultPosition={windowPositions.recent}
+            defaultSize={windowSizes.recent}
             isCollapsed={collapsedWindows.recent}
             onToggleCollapse={() => toggleWindow("recent")}
+            onPositionChange={(pos) => handlePositionChange("recent", pos)}
+            onSizeChange={(size) => handleSizeChange("recent", size)}
           >
             <RecentlyViewed />
           </FloatingWindow>
@@ -188,10 +212,12 @@ export default function Dashboard() {
           <FloatingWindow
             title="Shared with Me"
             icon={<Users className="w-5 h-5" />}
-            defaultPosition={{ x: 50, y: 150 }}
-            defaultSize={{ width: 800, height: 600 }}
+            defaultPosition={windowPositions.shared}
+            defaultSize={windowSizes.shared}
             isCollapsed={collapsedWindows.shared}
             onToggleCollapse={() => toggleWindow("shared")}
+            onPositionChange={(pos) => handlePositionChange("shared", pos)}
+            onSizeChange={(size) => handleSizeChange("shared", size)}
           >
             <SharedWithMe />
           </FloatingWindow>
@@ -201,10 +227,12 @@ export default function Dashboard() {
           <FloatingWindow
             title="Search Files"
             icon={<Search className="w-5 h-5" />}
-            defaultPosition={{ x: 50, y: 150 }}
-            defaultSize={{ width: 800, height: 600 }}
+            defaultPosition={windowPositions.search}
+            defaultSize={windowSizes.search}
             isCollapsed={collapsedWindows.search}
             onToggleCollapse={() => toggleWindow("search")}
+            onPositionChange={(pos) => handlePositionChange("search", pos)}
+            onSizeChange={(size) => handleSizeChange("search", size)}
           >
             <FileSearch />
           </FloatingWindow>
@@ -214,10 +242,12 @@ export default function Dashboard() {
           <FloatingWindow
             title="Bookmarks"
             icon={<Star className="w-5 h-5" />}
-            defaultPosition={{ x: 50, y: 150 }}
-            defaultSize={{ width: 800, height: 600 }}
+            defaultPosition={windowPositions.bookmarks}
+            defaultSize={windowSizes.bookmarks}
             isCollapsed={collapsedWindows.bookmarks}
             onToggleCollapse={() => toggleWindow("bookmarks")}
+            onPositionChange={(pos) => handlePositionChange("bookmarks", pos)}
+            onSizeChange={(size) => handleSizeChange("bookmarks", size)}
           >
             <BookmarkedFiles />
           </FloatingWindow>
@@ -227,10 +257,12 @@ export default function Dashboard() {
           <FloatingWindow
             title="View History"
             icon={<History className="w-5 h-5" />}
-            defaultPosition={{ x: 50, y: 150 }}
-            defaultSize={{ width: 800, height: 600 }}
+            defaultPosition={windowPositions.history}
+            defaultSize={windowSizes.history}
             isCollapsed={collapsedWindows.history}
             onToggleCollapse={() => toggleWindow("history")}
+            onPositionChange={(pos) => handlePositionChange("history", pos)}
+            onSizeChange={(size) => handleSizeChange("history", size)}
           >
             <ViewHistory />
           </FloatingWindow>
