@@ -38,7 +38,7 @@ export function Header() {
                 </svg>
               </div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white hidden sm:block">
-                My Google Dashboard
+                SmartDrive Dashboard
               </h1>
             </Link>
 

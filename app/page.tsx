@@ -76,11 +76,11 @@ export default function Home() {
           </div>
 
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            My Google Dashboard
+            SmartDrive Dashboard
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            A better way to find and organize your Google Drive files.
-            See files shared with you, track recently viewed documents, and never lose track of important files again.
+            A floating window interface for managing your Google Drive files.
+            Drag, organize, and find files with intelligent buckets, bookmarks, and search - all in movable windows you control.
           </p>
 
           {/* Sign In Card */}

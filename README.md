@@ -1,10 +1,10 @@
-# My Google Drive Dashboard 🚀
+# SmartDrive Dashboard 🚀
 
-A better way to find and organize your Google Drive files. Never lose track of shared documents again!
+A floating window interface for managing your Google Drive files with intelligent organization. Never lose track of shared documents again!
 
 **The Problem**: Google Drive's default UI makes it hard to find files shared with you, distinguish file types at a glance, or remember where you saw something before.
 
-**The Solution**: This dashboard surfaces the right files at the right time, with clear organization by type, recency, and collaborator.
+**The Solution**: SmartDrive Dashboard gives you draggable, resizable windows for every file view, plus virtual buckets for custom organization. Drag files between windows, collapse views you're not using, and arrange your workspace however you like.
 
 <div align="center">
 

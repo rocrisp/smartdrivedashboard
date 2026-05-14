@@ -1,7 +1,8 @@
 {
-  "name": "mygoogledashboard",
+  "name": "smartdrive-dashboard",
   "version": "0.1.0",
   "private": true,
+  "description": "SmartDrive Dashboard - A floating window interface for managing Google Drive files with intelligent organization",
   "scripts": {
     "dev": "next dev",
     "dev:safe": "./scripts/dev.sh",

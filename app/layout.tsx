@@ -9,34 +9,35 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "My Google Dashboard",
-    template: "%s | My Google Dashboard",
+    default: "SmartDrive Dashboard",
+    template: "%s | SmartDrive Dashboard",
   },
   description:
-    "A modern, secure personal dashboard for managing your Google services. Built with Next.js, TypeScript, and PostgreSQL.",
+    "A floating window interface for managing your Google Drive files with intelligent organization, virtual buckets, and smart search.",
   keywords: [
-    "Google Dashboard",
+    "Google Drive",
+    "Drive Manager",
+    "File Organization",
     "OAuth",
     "Next.js",
     "TypeScript",
-    "PostgreSQL",
-    "Personal Dashboard",
+    "Smart Dashboard",
   ],
-  authors: [{ name: "My Google Dashboard" }],
-  creator: "My Google Dashboard",
+  authors: [{ name: "SmartDrive Dashboard" }],
+  creator: "SmartDrive Dashboard",
   metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "./",
-    title: "My Google Dashboard",
-    description: "A modern personal dashboard for your Google services",
-    siteName: "My Google Dashboard",
+    title: "SmartDrive Dashboard",
+    description: "A floating window interface for managing your Google Drive files",
+    siteName: "SmartDrive Dashboard",
   },
   twitter: {
     card: "summary_large_image",
-    title: "My Google Dashboard",
-    description: "A modern personal dashboard for your Google services",
+    title: "SmartDrive Dashboard",
+    description: "A floating window interface for managing your Google Drive files",
   },
   robots: {
     index: false,
