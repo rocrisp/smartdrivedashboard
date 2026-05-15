@@ -143,7 +143,7 @@ export function FloatingWindow({
       {/* Content */}
       {!isCollapsed && (
         <>
-          <div className="overflow-auto" style={{ height: `calc(${defaultSize.height}px - 56px)` }}>
+          <div style={{ height: `calc(${defaultSize.height}px - 56px)` }}>
             {children}
           </div>
 

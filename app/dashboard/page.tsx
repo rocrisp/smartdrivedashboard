@@ -165,34 +165,36 @@ export default function Dashboard() {
             onPositionChange={setFilesWindowPosition}
             onSizeChange={setFilesWindowSize}
           >
-            {/* Tabs inside window */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
-              <div className="flex overflow-x-auto">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-3 font-medium transition-all whitespace-nowrap border-b-2 ${
-                      activeTab === tab.id
-                        ? "border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
-                        : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                    }`}
-                  >
-                    {tab.icon}
-                    <span className="text-sm">{tab.label}</span>
-                  </button>
-                ))}
+            <div className="flex flex-col h-full">
+              {/* Sticky Tabs */}
+              <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex overflow-x-auto">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2 px-4 py-3 font-medium transition-all whitespace-nowrap border-b-2 ${
+                        activeTab === tab.id
+                          ? "border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                          : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      }`}
+                    >
+                      {tab.icon}
+                      <span className="text-sm">{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Tab Content */}
-            <div className="p-4">
-              {activeTab === "recent" && <RecentlyViewed />}
-              {activeTab === "shared" && <SharedWithMe />}
-              {activeTab === "search" && <FileSearch />}
-              {activeTab === "bookmarks" && <BookmarkedFiles />}
-              {activeTab === "history" && <ViewHistory />}
-              {activeTab === "hidden" && <HiddenFiles />}
+              {/* Scrollable Tab Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {activeTab === "recent" && <RecentlyViewed />}
+                {activeTab === "shared" && <SharedWithMe />}
+                {activeTab === "search" && <FileSearch />}
+                {activeTab === "bookmarks" && <BookmarkedFiles />}
+                {activeTab === "history" && <ViewHistory />}
+                {activeTab === "hidden" && <HiddenFiles />}
+              </div>
             </div>
           </FloatingWindow>
         )}
