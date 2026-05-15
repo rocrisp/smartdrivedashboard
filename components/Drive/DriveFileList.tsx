@@ -4,29 +4,46 @@ import { useState, useEffect } from "react";
 import { DriveFile } from "@/lib/google-drive";
 import { BookmarksManager } from "@/lib/bookmarks";
 import { ViewHistoryManager } from "@/lib/view-history";
-import { FileText, Sheet, Presentation, Folder, Link2, File, Image, Video, Star } from "lucide-react";
+import { HiddenFilesManager } from "@/lib/hidden-files";
+import { FileText, Sheet, Presentation, Folder, Link2, File, Image, Video, Star, EyeOff } from "lucide-react";
 
 interface DriveFileListProps {
   files: DriveFile[];
   groupBy?: "sharer" | "type" | "none";
+  showHidden?: boolean;
 }
 
-export function DriveFileList({ files, groupBy = "none" }: DriveFileListProps) {
+export function DriveFileList({ files, groupBy = "none", showHidden = false }: DriveFileListProps) {
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Load bookmarked status for all files
     const bookmarks = BookmarksManager.getBookmarks();
     setBookmarkedIds(new Set(bookmarks.map((b) => b.fileId)));
 
+    // Load hidden files
+    const hidden = HiddenFilesManager.getHiddenFileIds();
+    setHiddenIds(hidden);
+
     // Listen for bookmark changes
-    const handleUpdate = () => {
+    const handleBookmarkUpdate = () => {
       const updated = BookmarksManager.getBookmarks();
       setBookmarkedIds(new Set(updated.map((b) => b.fileId)));
     };
 
-    window.addEventListener("bookmarks-updated", handleUpdate);
-    return () => window.removeEventListener("bookmarks-updated", handleUpdate);
+    // Listen for hidden files changes
+    const handleHiddenUpdate = () => {
+      const updated = HiddenFilesManager.getHiddenFileIds();
+      setHiddenIds(updated);
+    };
+
+    window.addEventListener("bookmarks-updated", handleBookmarkUpdate);
+    window.addEventListener("hidden-files-updated", handleHiddenUpdate);
+    return () => {
+      window.removeEventListener("bookmarks-updated", handleBookmarkUpdate);
+      window.removeEventListener("hidden-files-updated", handleHiddenUpdate);
+    };
   }, []);
 
   const toggleBookmark = (file: DriveFile, e: React.MouseEvent) => {
@@ -41,6 +58,20 @@ export function DriveFileList({ files, groupBy = "none" }: DriveFileListProps) {
 
     // Trigger update
     window.dispatchEvent(new Event("bookmarks-updated"));
+  };
+
+  const toggleHidden = (file: DriveFile, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (hiddenIds.has(file.id)) {
+      HiddenFilesManager.unhideFile(file.id);
+    } else {
+      HiddenFilesManager.hideFile(file);
+    }
+
+    // Trigger update
+    window.dispatchEvent(new Event("hidden-files-updated"));
   };
 
   const handleFileClick = (file: DriveFile) => {
@@ -80,9 +111,14 @@ export function DriveFileList({ files, groupBy = "none" }: DriveFileListProps) {
   };
 
   const groupedFiles = () => {
+    // Filter hidden files unless showHidden is true
+    const visibleFiles = showHidden
+      ? files
+      : files.filter(file => !hiddenIds.has(file.id));
+
     if (groupBy === "sharer") {
       const groups: Record<string, DriveFile[]> = {};
-      files.forEach((file) => {
+      visibleFiles.forEach((file) => {
         const sharer = file.sharingUser?.displayName || "Unknown";
         if (!groups[sharer]) groups[sharer] = [];
         groups[sharer].push(file);
@@ -91,14 +127,14 @@ export function DriveFileList({ files, groupBy = "none" }: DriveFileListProps) {
     }
     if (groupBy === "type") {
       const groups: Record<string, DriveFile[]> = {};
-      files.forEach((file) => {
+      visibleFiles.forEach((file) => {
         const type = getFileType(file.mimeType);
         if (!groups[type]) groups[type] = [];
         groups[type].push(file);
       });
       return groups;
     }
-    return { "All Files": files };
+    return { "All Files": visibleFiles };
   };
 
   const getFileType = (mimeType: string): string => {
@@ -165,19 +201,34 @@ export function DriveFileList({ files, groupBy = "none" }: DriveFileListProps) {
                         <span>Modified {formatDate(file.modifiedTime)}</span>
                       </div>
                     </div>
-                    <button
-                      onClick={(e) => toggleBookmark(file, e)}
-                      className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-                      title={bookmarkedIds.has(file.id) ? "Remove bookmark" : "Add bookmark"}
-                    >
-                      <Star
-                        className={`w-5 h-5 ${
-                          bookmarkedIds.has(file.id)
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-400"
-                        }`}
-                      />
-                    </button>
+                    <div className="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                      <button
+                        onClick={(e) => toggleHidden(file, e)}
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        title={hiddenIds.has(file.id) ? "Unhide file" : "Hide file"}
+                      >
+                        <EyeOff
+                          className={`w-5 h-5 ${
+                            hiddenIds.has(file.id)
+                              ? "text-red-500"
+                              : "text-gray-400"
+                          }`}
+                        />
+                      </button>
+                      <button
+                        onClick={(e) => toggleBookmark(file, e)}
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        title={bookmarkedIds.has(file.id) ? "Remove bookmark" : "Add bookmark"}
+                      >
+                        <Star
+                          className={`w-5 h-5 ${
+                            bookmarkedIds.has(file.id)
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-400"
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </a>
               </div>

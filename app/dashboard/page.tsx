@@ -8,17 +8,18 @@ import { RecentlyViewed } from "@/components/Drive/RecentlyViewed";
 import { FileSearch } from "@/components/Drive/FileSearch";
 import { BookmarkedFiles } from "@/components/Drive/BookmarkedFiles";
 import { ViewHistory } from "@/components/Drive/ViewHistory";
+import { HiddenFiles } from "@/components/Drive/HiddenFiles";
 import { CollectionsSidebar } from "@/components/Drive/CollectionsSidebar";
 import { FloatingHelpButton } from "@/components/FloatingHelpButton";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingWindow } from "@/components/ui/FloatingWindow";
-import { Clock, Users, Search, Star, History, FolderOpen } from "lucide-react";
+import { Clock, Users, Search, Star, History, FolderOpen, EyeOff } from "lucide-react";
 import { IntelligenceManager } from "@/lib/intelligence/intelligence-manager";
 import { DriveFile } from "@/lib/google-drive";
 
-type Tab = "recent" | "shared" | "search" | "bookmarks" | "history";
+type Tab = "recent" | "shared" | "search" | "bookmarks" | "history" | "hidden";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -113,6 +114,7 @@ export default function Dashboard() {
     { id: "search" as Tab, label: "Search Files", icon: <Search className="w-4 h-4" /> },
     { id: "bookmarks" as Tab, label: "Bookmarks", icon: <Star className="w-4 h-4" /> },
     { id: "history" as Tab, label: "View History", icon: <History className="w-4 h-4" /> },
+    { id: "hidden" as Tab, label: "Hidden Files", icon: <EyeOff className="w-4 h-4" /> },
   ];
 
   return (
@@ -190,6 +192,7 @@ export default function Dashboard() {
               {activeTab === "search" && <FileSearch />}
               {activeTab === "bookmarks" && <BookmarkedFiles />}
               {activeTab === "history" && <ViewHistory />}
+              {activeTab === "hidden" && <HiddenFiles />}
             </div>
           </FloatingWindow>
         )}
